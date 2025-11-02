@@ -1,15 +1,9 @@
-import { GoogleGenAI } from "@google/genai";
+import { ReplyEntry, TutorResponse } from "../type/types";
+import axios from "axios";
+import { History } from "../api/aiTutor/route";
 
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY!;
-const ai = new GoogleGenAI({ apiKey: API_KEY });
 
-interface TutorResponse {
-  reply: string;
-  feedback: string;
-  level: string;
-}
-
-/** 텍스트를 음성으로 출력 */
 function speakText(text: string, lang = "en-US") {
   if (!("speechSynthesis" in window)) {
     console.warn("Browser does not support SpeechSynthesis");
@@ -24,45 +18,22 @@ function speakText(text: string, lang = "en-US") {
 
 /** 영어 문장을 Gemini에게 보내 JSON + 음성으로 응답 받기 */
 export async function requestEnglishTutorResponse(
-  userText: string
+  userText: string,
+  reply: ReplyEntry[]
 ): Promise<TutorResponse> {
-  const prompt = `
-        You are a kind and patient English tutor.
-        Always respond strictly in JSON:
-
-        {
-        "reply": string,
-        "feedback": string,
-        "level": string
-        }
-
-        If you cannot respond in JSON, output "{}".
-        User: "${userText}"
-    `;
+  const history = reply.map((data) => ({
+    user: data.message,
+    assistant: data.reply,
+  }));
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
+    const req = await axios.post("/api/aiTutor", {
+      userText,
+      history: history,
     });
-
-    const text = (response.text || "").trim();
-
-    try {
-      const cleanText = text.replace(/```json|```/g, "").trim();
-      const parsed: TutorResponse = JSON.parse(cleanText);
-      speakText(parsed.reply);
-
-      return {
-        reply: parsed.reply || "",
-        feedback: parsed.feedback || "",
-        level: parsed.level || "",
-      };
-    } catch {
-      console.warn("⚠️ JSON 파싱 실패:", text);
-      speakText(text);
-      return { reply: text, feedback: "", level: "" };
-    }
+    const data: TutorResponse = req.data;
+    speakText(data.reply);
+    return data;
   } catch (error) {
     console.error("Gemini 요청 오류:", error);
     throw new Error("AI 응답을 가져오지 못했습니다.");

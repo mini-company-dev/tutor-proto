@@ -1,9 +1,8 @@
-"use client";
-
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { requestEnglishTutorResponse } from "@/app/service/geminiApi";
 import {
   ConversationStatus,
+  EvaluationMetrics,
   ReplyEntry,
   TranscriptEntry,
 } from "@/app/type/types";
@@ -13,13 +12,45 @@ export const useHandlerAccess = () => {
     ConversationStatus.IDLE
   );
   const [transcripts, setTranscripts] = useState<TranscriptEntry[]>([]);
-
-  const [reply, setReply] = useState<ReplyEntry[]>([]);
-
   const [interimTranscript, setInterimTranscript] = useState("");
   const [assessment, setAssessment] = useState("");
+
+  const [reply, setReply] = useState<ReplyEntry[]>([]);
+  const [evaluation, setEvaluation] = useState<EvaluationMetrics>({
+    accuracy: 0,
+    complexity: 0,
+    confidence: 0,
+    vocabulary: 0,
+    spontaneity: 0,
+  });
+
+  const evaluationCount = useRef(0);
+
+  const updateEvaluation = (newEval: EvaluationMetrics) => {
+    evaluationCount.current += 1;
+    const n = evaluationCount.current;
+
+    // 평균 업데이트
+    setEvaluation((prev) => ({
+      accuracy: (prev.accuracy * (n - 1) + newEval.accuracy) / n,
+      complexity: (prev.complexity * (n - 1) + newEval.complexity) / n,
+      confidence: (prev.confidence * (n - 1) + newEval.confidence) / n,
+      vocabulary: (prev.vocabulary * (n - 1) + newEval.vocabulary) / n,
+      spontaneity: (prev.spontaneity * (n - 1) + newEval.spontaneity) / n,
+    }));
+  };
+
   const [error, setError] = useState<string | null>(null);
   const transcriptEndRef = useRef<HTMLDivElement>(null);
+
+  const replyRef = useRef<ReplyEntry[]>([]);
+  useEffect(() => {
+    replyRef.current = reply;
+  }, [reply]);
+
+  useEffect(() => {
+    console.log(evaluation);
+  }, [evaluation]);
 
   const handleUserInput = useCallback(async (userText: string) => {
     if (!userText.trim()) return;
@@ -27,13 +58,12 @@ export const useHandlerAccess = () => {
     setError(null);
 
     try {
-      // 🧠 유저의 메시지를 추가
+      // 지우고 싶음
       setTranscripts((prev) => [...prev, { speaker: "user", text: userText }]);
+      const res = await requestEnglishTutorResponse(userText, replyRef.current);
+      updateEvaluation(res);
 
-      // ✅ Gemini에게 요청
-      const res = await requestEnglishTutorResponse(userText);
-
-      // 🧩 Gemini 응답 추가
+      // 지우고 싶음
       setTranscripts((prev) => [...prev, { speaker: "ai", text: res.reply }]);
 
       setReply((prev) => [
@@ -54,6 +84,7 @@ export const useHandlerAccess = () => {
   return {
     status,
     reply,
+    evaluation,
     transcripts,
     interimTranscript,
     assessment,

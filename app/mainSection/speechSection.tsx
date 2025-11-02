@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { BotIcon, SparklesIcon } from "./icons";
-import SpeechDefault from "./aiTutorApi/ui/speechDefault";
 import SpeechCall from "./aiTutorApi/ui/speechCall";
 
 export default function ApiSection() {

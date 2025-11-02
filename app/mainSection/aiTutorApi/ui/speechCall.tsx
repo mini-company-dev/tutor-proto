@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { motion, useAnimation } from "framer-motion";
+import { useEffect, useState } from "react";
+import { useAnimation } from "framer-motion";
 import { ConversationStatus } from "../../../type/types";
 import { BotIcon, MicIcon, PhoneOffIcon } from "../../icons";
 import { StatusIndicator } from "../StatusIndicator";
 import { useHandlerAccess } from "../useHandlerAccess";
 import { useSpeechHandler } from "../useSpeechHandler";
-import { bounce, hoverScale, MiniBox, MiniButton, popIn } from "ministudio-ui";
+import { hoverScale, MiniBox, MiniButton } from "ministudio-ui";
+import EvaluationRadarChart from "./EvaluationRadarChart";
 
 export default function SpeechCallMinimal({
   onClose,
@@ -17,6 +18,7 @@ export default function SpeechCallMinimal({
   const {
     status,
     reply,
+    evaluation,
     transcripts,
     interimTranscript,
     assessment,
@@ -24,6 +26,8 @@ export default function SpeechCallMinimal({
     transcriptEndRef,
     handleUserInput,
   } = useHandlerAccess();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { transcript, listening, startListening, stopListening } =
     useSpeechHandler(handleUserInput);
@@ -100,12 +104,24 @@ export default function SpeechCallMinimal({
         </MiniButton>
 
         <MiniButton
-          onClick={onClose}
+          onClick={() => setIsModalOpen(true)}
           uiHover={[hoverScale(1.1)]}
           className="flex items-center justify-center w-20 h-20 rounded-full bg-gray-800 hover:bg-red-800 border border-gray-600"
         >
           <PhoneOffIcon className="w-9 h-9 rotate-[135deg]" />
         </MiniButton>
+
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md">
+            <EvaluationRadarChart
+              evaluation={evaluation}
+              onClose={() => {
+                setIsModalOpen(false);
+                onClose();
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
