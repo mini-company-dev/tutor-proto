@@ -1,26 +1,77 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --brand: #4a90e2;
+  --sub: #fafafa;
+  --bg: #ffffff;
+  --text: #1a1a2e;
+  --text-light: #6b7280;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* section {
+  position: relative;
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.15) 0 1px,
+      transparent 1px calc(100% / 6)
+    ),
+    linear-gradient(rgba(0, 0, 0, 0.15) 0 0);
+  background-size: 100% 100%, 100% 1px;
+  background-repeat: repeat, no-repeat;
+  background-position: 0 0, 0 100%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@media (min-width: 640px) {
+  section {
+    background-image:
+      repeating-linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.15) 0 1px,
+        transparent 1px calc(100% / 20)
+      ),
+      linear-gradient(rgba(0, 0, 0, 0.15) 0 0);
+  }
+} */
+
+
+
+@layer base {
+  body {
+    @apply font-sans leading-relaxed;
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  strong {
+    color: var(--brand);
+    font-weight: bold;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  section {
+    @apply w-full grid grid-cols-6 relative sm:grid-cols-20;
+  }
+
+  /* Mini UI Styles */
+  .mini-basic {
+    @apply text-[var(--text)] bg-[var(--sub)] border border-gray-200;
+  }
+
+  .mini-brand {
+    @apply bg-[var(--brand)] text-white;
+  }
+
+  .hover\:to-mini-brand:hover {
+    @apply bg-[var(--brand)] text-white;
+  }
+
+  .mini-outline {
+    @apply border border-[var(--brand)] text-[var(--brand)];
+  }
+
+  .mini-no-transition {
+    transition: none !important;
+  }
 }
