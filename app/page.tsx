@@ -1,4 +1,5 @@
 import MainHeroSection from "./mainSection/hero";
+import LevelTestSection from "./mainSection/levelTestSection";
 import ApiSection from "./mainSection/speechSection";
 
 export default function Main() {
@@ -6,6 +7,7 @@ export default function Main() {
     <div>
       <MainHeroSection />
       <ApiSection />
+      <LevelTestSection />
     </div>
   );
 }
