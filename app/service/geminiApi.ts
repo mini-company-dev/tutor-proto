@@ -1,4 +1,4 @@
-import { ReplyEntry, TutorResponse } from "../type/types";
+import { ReplyEntry, TutorResponse } from "../../type/types";
 import axios from "axios";
 import { History } from "../api/aiTutor/route";
 

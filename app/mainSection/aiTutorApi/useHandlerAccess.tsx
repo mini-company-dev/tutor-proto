@@ -5,7 +5,7 @@ import {
   EvaluationMetrics,
   ReplyEntry,
   TranscriptEntry,
-} from "@/app/type/types";
+} from "@/type/types";
 
 export const useHandlerAccess = () => {
   const [status, setStatus] = useState<ConversationStatus>(

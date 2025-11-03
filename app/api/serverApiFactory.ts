@@ -7,7 +7,7 @@ import { getCached, setCached } from "@/lib/cache";
 export function createServerApiHandler<T>(
   method: Method,
   path: string,
-  cache: boolean
+  cacheKey?: string
 ) {
   return async (
     req: NextRequest,
@@ -17,29 +17,21 @@ export function createServerApiHandler<T>(
       const token = req.headers.get("token");
       const dto = req.method === "GET" ? undefined : await req.json();
 
-      const id = context?.params?.id;
-      const queryString = req.nextUrl.search;
-      const replacedPath = id ? path.replace(":id", id) : path;
-      const fullUrl = `${process.env.API_URL}${replacedPath}${
-        queryString || ""
-      }`;
+      const params = context ? await context.params : undefined;
+      const id = params?.id;
+      const fullPath = buildFullUrl(id, req, path);
 
-      console.log(fullUrl);
-
-      const cached = getCached(method, path);
-      if (cached) {
-        return NextResponse.json<CApiResponse<T>>(
-          {
-            req: cached.data as T,
-            explanation: cached.message ?? "요청 성공",
-          },
-          { status: cached.status }
-        );
+      if (cacheKey) {
+        const cached = getCached(buildCacheKey(cacheKey, id));
+        if (cached) {
+          console.log("CACHE");
+          return apiSuccessHandler<T>(cached);
+        }
       }
 
       const config: AxiosRequestConfig = {
         method,
-        url: fullUrl,
+        url: fullPath,
         data: dto,
         headers: {
           "Content-Type": "application/json",
@@ -48,27 +40,49 @@ export function createServerApiHandler<T>(
         validateStatus: () => true,
       };
 
-      const res = await axios.request<SApiResponse<T>>(config);
-      const response = res.data;
-      if (cache) setCached(method, path, response);
-
-      return NextResponse.json<CApiResponse<T>>(
-        {
-          req: response.data as T,
-          explanation: response.message ?? "요청 성공",
-        },
-        { status: res.status }
-      );
+      const serverResponse = await axios.request<SApiResponse<T>>(config);
+      const response = serverResponse.data;
+      if (cacheKey) setCached(buildCacheKey(cacheKey, id), response);
+      return apiSuccessHandler<T>(response);
     } catch (err: any) {
       console.error("Server API Error:", err.message);
-      return NextResponse.json(
-        {
-          data: undefined,
-          explanation:
-            err.response?.data?.message || err.message || "서버 오류",
-        },
-        { status: err.response?.status || 500 }
-      );
+      return apiErrorHandler(err);
     }
   };
 }
+
+export const buildCacheKey = (cacheKey: string, id?: string) => {
+  return `${cacheKey}:${id}`;
+};
+
+const buildFullUrl = (
+  id: string | undefined,
+  req: NextRequest,
+  path: string
+) => {
+  const queryString = req.nextUrl.search;
+  const replacedPath = id ? path.replace(":id", id) : path;
+  return `${process.env.API_URL}${replacedPath}${queryString || ""}`;
+};
+
+const apiSuccessHandler = <T>(
+  response: SApiResponse<T>
+): NextResponse<CApiResponse<T>> => {
+  return NextResponse.json<CApiResponse<T>>(
+    {
+      payload: response.data,
+      explanation: response.message ?? "요청 성공",
+    },
+    { status: 200 }
+  );
+};
+
+const apiErrorHandler = <T>(err: any): NextResponse<CApiResponse<T>> => {
+  return NextResponse.json(
+    {
+      payload: undefined,
+      explanation: err.response?.data?.message || err.message || "서버 오류",
+    },
+    { status: err.response?.status || 500 }
+  );
+};

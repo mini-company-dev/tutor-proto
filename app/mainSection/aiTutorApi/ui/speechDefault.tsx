@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { ConversationStatus } from "../../../type/types";
+import { ConversationStatus } from "../../../../type/types";
 import { BotIcon, MicIcon, StopCircleIcon, UserIcon, XIcon } from "../../icons";
 import { StatusIndicator } from "../StatusIndicator";
 import { useHandlerAccess } from "../useHandlerAccess";

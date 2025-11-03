@@ -1,36 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CGrammarTest } from "@/type/client/clientGrammerTestAnswer";
-import { getGrammerTestAnswerByLevel } from "@/lib/grammerTestAnswer";
 import Step1 from "./step/step1";
 import Step2 from "./step/step2";
+import useLevelTest from "./step/useLevelTest";
 
 export default function LevelTest() {
-  const [step, setStep] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [test, setTest] = useState<CGrammarTest[]>([]);
-
-  const nextStep = () => {
-    setStep(step + 1);
-  };
-
-  useEffect(() => {
-    async function fetchTests() {
-      try {
-        const res = await getGrammerTestAnswerByLevel("B1", "Grammar");
-        if (res.req) {
-          setTest(res.req);
-        }
-        console.log(res);
-      } catch (err) {
-        console.error("문제 불러오기 실패:", err);
-      }
-    }
-
-    fetchTests();
-  }, []);
-
+  const { step, nextStep, progress, getTest, onSubmitAnswer } = useLevelTest();
   return (
     <div>
       {step === 0 && <Step1 nextStep={nextStep} />}
@@ -38,9 +13,9 @@ export default function LevelTest() {
       {step >= 1 && step <= 3 && (
         <Step2
           nextStep={nextStep}
-          test={test[step]}
-          setProgress={setProgress}
           step={step}
+          test={getTest()}
+          onSubmitAnswer={onSubmitAnswer}
         />
       )}
       {/*

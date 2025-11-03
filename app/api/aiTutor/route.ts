@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
-import { ReplyEntry, TutorResponse } from "@/app/type/types";
+import { ReplyEntry, TutorResponse } from "@/type/types";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.API_KEY!,

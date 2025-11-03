@@ -8,7 +8,7 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
-import { EvaluationMetrics } from "@/app/type/types";
+import { EvaluationMetrics } from "@/type/types";
 import { hoverScale, MiniButton, MiniBox } from "ministudio-ui";
 import { PhoneOffIcon } from "../../icons";
 import { motion } from "framer-motion";

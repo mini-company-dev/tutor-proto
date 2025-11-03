@@ -20,12 +20,12 @@ export async function requestApi<T>(
       return res.data;
     }
     return {
-      req: undefined,
+      payload: undefined,
       explanation: "요청 실패",
     };
   } catch (error: any) {
     return {
-      req: undefined,
+      payload: undefined,
       explanation: "요청 실패",
     };
   }

@@ -9,7 +9,7 @@ export type STestType =
 export interface SGrammarTestAnswer {
   id: string;
   content: string;
-  correct: boolean;
+  correct: boolean | undefined;
 }
 
 export interface SGrammarTest {

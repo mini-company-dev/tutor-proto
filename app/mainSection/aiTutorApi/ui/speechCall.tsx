@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAnimation } from "framer-motion";
-import { ConversationStatus } from "../../../type/types";
+import { ConversationStatus } from "../../../../type/types";
 import { BotIcon, MicIcon, PhoneOffIcon } from "../../icons";
 import { StatusIndicator } from "../StatusIndicator";
 import { useHandlerAccess } from "../useHandlerAccess";
