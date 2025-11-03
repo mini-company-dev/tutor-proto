@@ -1,0 +1,54 @@
+name: CI/CD
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    name: CI
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build Docker Image
+        run: docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/tutor-frontend .
+
+      - name: Login DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_ID }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Docker Image push
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/tutor-frontend
+
+  deploy:
+    name: CD
+    runs-on: ubuntu-latest
+    permissions: write-all
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: CD
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            cd ~/front
+            docker login -u ${{ secrets.DOCKERHUB_ID }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            docker compose pull
+            docker compose down
+            docker compose up -d
+            docker image prune -f
