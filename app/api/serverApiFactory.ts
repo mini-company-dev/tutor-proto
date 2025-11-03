@@ -9,13 +9,22 @@ export function createServerApiHandler<T>(
   path: string,
   cache: boolean
 ) {
-  return async (req: NextRequest): Promise<NextResponse<CApiResponse<T>>> => {
+  return async (
+    req: NextRequest,
+    context?: { params?: { id?: string } }
+  ): Promise<NextResponse<CApiResponse<T>>> => {
     try {
       const token = req.headers.get("token");
       const dto = req.method === "GET" ? undefined : await req.json();
 
+      const id = context?.params?.id;
       const queryString = req.nextUrl.search;
-      const fullUrl = `${process.env.API_URL}${path}${queryString || ""}`;
+      const replacedPath = id ? path.replace(":id", id) : path;
+      const fullUrl = `${process.env.API_URL}${replacedPath}${
+        queryString || ""
+      }`;
+
+      console.log(fullUrl);
 
       const cached = getCached(method, path);
       if (cached) {

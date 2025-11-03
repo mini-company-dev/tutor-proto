@@ -15,3 +15,9 @@ export async function getGrammerTestAnswerByLevel(
     `/api/test?level=${level}&type=${testType}`
   );
 }
+
+export async function getGrammerTestAnswerById(
+  id: string
+): Promise<CApiResponse<CGrammarTest[]>> {
+  return requestApi<CGrammarTest[]>("GET", `/api/test/${id}`);
+}

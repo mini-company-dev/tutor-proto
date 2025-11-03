@@ -1,13 +1,25 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { getGrammerTestAnswerById } from "@/lib/grammerTestAnswer";
 import { CGrammarTest } from "@/type/client/clientGrammerTestAnswer";
 import { MiniButton, MiniUiType } from "ministudio-ui";
+import { useEffect } from "react";
 
 interface Prop {
   nextStep: () => void;
   test: CGrammarTest;
   setProgress: React.Dispatch<React.SetStateAction<number>>;
+  step: number;
 }
-export default function Step2({ nextStep, test, setProgress }: Prop) {
+export default function Step2({ nextStep, test, setProgress, step }: Prop) {
+  useEffect(() => {
+    async function fetchTests() {
+      const data = await getGrammerTestAnswerById(test.id);
+      if (data.req) {
+        console.log(data);
+      }
+    }
+    fetchTests();
+  }, []);
   return (
     <Card className="max-w-2xl w-full bg-[var(--card)] border border-[var(--border)] p-8 shadow-lg">
       <CardContent className="space-y-6">
@@ -16,7 +28,7 @@ export default function Step2({ nextStep, test, setProgress }: Prop) {
         </div>
         <div className="rounded-xl p-6 bg-[var(--muted)]/30 text-[var(--foreground)]">
           <p className="text-lg font-medium mb-3">
-            Q5. Choose the correct option:
+            Q{step}. Choose the correct option:
           </p>
           <p className="mb-4">{test.problem}</p>
           <div className="grid gap-3">

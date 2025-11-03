@@ -7,7 +7,7 @@ import Step1 from "./step/step1";
 import Step2 from "./step/step2";
 
 export default function LevelTest() {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [test, setTest] = useState<CGrammarTest[]>([]);
 
@@ -33,10 +33,15 @@ export default function LevelTest() {
 
   return (
     <div>
-      {step === 1 && <Step1 nextStep={nextStep} />}
+      {step === 0 && <Step1 nextStep={nextStep} />}
 
-      {step === 2 && (
-        <Step2 nextStep={nextStep} test={test[0]} setProgress={setProgress} />
+      {step >= 1 && step <= 3 && (
+        <Step2
+          nextStep={nextStep}
+          test={test[step]}
+          setProgress={setProgress}
+          step={step}
+        />
       )}
       {/*
       {step === 3 && (

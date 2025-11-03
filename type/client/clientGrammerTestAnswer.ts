@@ -9,7 +9,6 @@ export type CTestType =
 export interface CGrammarTestAnswer {
   id: string;
   content: string;
-  correct: boolean;
 }
 
 export interface CGrammarTest {
