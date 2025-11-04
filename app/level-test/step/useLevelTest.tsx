@@ -4,22 +4,31 @@ import {
   getGrammerTestAnswerByLevel,
   gradingTestAnswerById,
 } from "@/lib/grammerTestAnswer";
-import { CGrammarTest, CLevel } from "@/type/client/clientGrammerTestAnswer";
+import {
+  CGrammarTest,
+  getCLevelByNumber,
+} from "@/type/client/clientGrammerTestAnswer";
 import { useEffect, useState } from "react";
 
 export default function useLevelTest() {
   const [step, setStep] = useState(0);
-  const [level, setLevel] = useState<CLevel>("B1");
+  const [level, setLevel] = useState(3);
   const [progress, setProgress] = useState(0);
   const [test, setTest] = useState<CGrammarTest[]>([]);
 
   useEffect(() => {
     async function fetchTests() {
       try {
-        const res = await getGrammerTestAnswerByLevel(level, "Grammar");
+        const res = await getGrammerTestAnswerByLevel(
+          getCLevelByNumber(level),
+          "Grammar"
+        );
+
         if (res.payload) {
-          setTest(res.payload);
-          console.log(res.payload);
+          setTest((prev) => {
+            const before = prev.slice(0, step + 1);
+            return [...before, ...(res.payload ?? [])];
+          });
         }
       } catch (err) {
         console.error("문제 불러오기 실패:", err);
@@ -30,8 +39,8 @@ export default function useLevelTest() {
   }, [level]);
 
   useEffect(() => {
-    console.log(progress);
-  }, [progress]);
+    console.log("test", test);
+  }, [test]);
 
   const nextStep = () => {
     setStep(step + 1);
@@ -39,13 +48,18 @@ export default function useLevelTest() {
 
   const onSubmitAnswer = async (id: string) => {
     const res = await gradingTestAnswerById(getTest().id, id);
-    if (res.payload) updateProgress();
+    if (res.payload) {
+      updateProgress();
+    }
+    if (getIsUpgrade(step)) {
+      setLevel((prev) => calculateNextLevel(prev, step, progress));
+    }
     nextStep();
   };
 
   const updateProgress = () => {
     {
-      switch (level) {
+      switch (getCLevelByNumber(level)) {
         case "A1":
           setProgress(progress + 1);
           break;
@@ -72,8 +86,33 @@ export default function useLevelTest() {
   };
 
   const getTest = (): CGrammarTest => {
-    return test[step];
+    return test[step - 1];
   };
 
   return { step, nextStep, progress, getTest, onSubmitAnswer };
 }
+
+const getIsUpgrade = (step: number): boolean => {
+  if (step === 3) {
+    return true;
+  }
+
+  if (step === 6) {
+    return true;
+  }
+
+  if (step >= 8) {
+    return true;
+  }
+
+  return false;
+};
+
+const calculateNextLevel = (
+  prevLevel: number,
+  step: number,
+  progress: number
+): number => {
+  const ratio = (progress + 1) / (step + 1);
+  return ratio >= 2 ? prevLevel + 1 : Math.max(1, prevLevel - 1);
+};
