@@ -11,9 +11,6 @@ export const useHandlerAccess = () => {
   const [status, setStatus] = useState<ConversationStatus>(
     ConversationStatus.IDLE
   );
-  const [transcripts, setTranscripts] = useState<TranscriptEntry[]>([]);
-  const [interimTranscript, setInterimTranscript] = useState("");
-  const [assessment, setAssessment] = useState("");
 
   const [reply, setReply] = useState<ReplyEntry[]>([]);
   const [evaluation, setEvaluation] = useState<EvaluationMetrics>({
@@ -44,6 +41,7 @@ export const useHandlerAccess = () => {
   const transcriptEndRef = useRef<HTMLDivElement>(null);
 
   const replyRef = useRef<ReplyEntry[]>([]);
+  
   useEffect(() => {
     replyRef.current = reply;
   }, [reply]);
@@ -58,13 +56,8 @@ export const useHandlerAccess = () => {
     setError(null);
 
     try {
-      // 지우고 싶음
-      setTranscripts((prev) => [...prev, { speaker: "user", text: userText }]);
       const res = await requestEnglishTutorResponse(userText, replyRef.current);
       updateEvaluation(res);
-
-      // 지우고 싶음
-      setTranscripts((prev) => [...prev, { speaker: "ai", text: res.reply }]);
 
       setReply((prev) => [
         ...prev,
@@ -85,9 +78,6 @@ export const useHandlerAccess = () => {
     status,
     reply,
     evaluation,
-    transcripts,
-    interimTranscript,
-    assessment,
     error,
     transcriptEndRef,
     handleUserInput,

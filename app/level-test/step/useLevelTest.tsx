@@ -38,10 +38,6 @@ export default function useLevelTest() {
     fetchTests();
   }, [level]);
 
-  useEffect(() => {
-    console.log("test", test);
-  }, [test]);
-
   const nextStep = () => {
     setStep(step + 1);
   };
@@ -54,6 +50,10 @@ export default function useLevelTest() {
     if (getIsUpgrade(step)) {
       setLevel((prev) => calculateNextLevel(prev, step, progress));
     }
+    nextStep();
+  };
+
+  const onSubmitSpeech = async () => {
     nextStep();
   };
 
@@ -89,19 +89,11 @@ export default function useLevelTest() {
     return test[step - 1];
   };
 
-  return { step, nextStep, progress, getTest, onSubmitAnswer };
+  return { step, nextStep, progress, getTest, onSubmitAnswer, onSubmitSpeech };
 }
 
 const getIsUpgrade = (step: number): boolean => {
-  if (step === 3) {
-    return true;
-  }
-
-  if (step === 6) {
-    return true;
-  }
-
-  if (step >= 8) {
+  if (step % 3 == 0) {
     return true;
   }
 

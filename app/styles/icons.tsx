@@ -157,14 +157,14 @@ export const PhoneIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-export const PhoneOffIcon: React.FC<React.SVGProps<SVGSVGElement>> = (
+export const EndSessionIcon: React.FC<React.SVGProps<SVGSVGElement>> = (
   props
 ) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
     width="24"
     height="24"
-    viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
     strokeWidth="2"
@@ -172,7 +172,8 @@ export const PhoneOffIcon: React.FC<React.SVGProps<SVGSVGElement>> = (
     strokeLinejoin="round"
     {...props}
   >
-    <path d="M10.5 13.5a5.3 5.3 0 0 1-3-3L4.6 7.1a1 1 0 0 1 .2-1.1l2.2-2.2a1 1 0 0 1 1.1-.2c1.5.6 3.1 1 4.7 1.2a1 1 0 0 1 .9 1v2a1 1 0 0 1-1 1h-.4a12 12 0 0 0 3 3h.4a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1c-1.5-.2-3.1-.6-4.6-1.2a1 1 0 0 1-1.1.2l-2.2-2.2a1 1 0 0 1-.2-1.1l.9-2.3Z" />
-    <line x1="22" y1="2" x2="2" y2="22" />
+    {/* 전원 / 종료 아이콘 */}
+    <circle cx="12" cy="12" r="9" strokeOpacity="0.6" />
+    <line x1="12" y1="8" x2="12" y2="12" />
   </svg>
 );

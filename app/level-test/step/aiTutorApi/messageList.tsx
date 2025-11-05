@@ -1,4 +1,4 @@
-import { BotIcon, UserIcon } from "../icons";
+import { BotIcon, UserIcon } from "../../../styles/icons";
 
 export const MessageList = ({
   transcripts,

@@ -1,13 +1,13 @@
-import MainHeroSection from "./mainSection/hero";
+import FeatureSection from "./mainSection/featureSection";
+import MainHeroSection from "./mainSection/heroSection";
 import LevelTestSection from "./mainSection/levelTestSection";
-import ApiSection from "./mainSection/speechSection";
 
 export default function Main() {
   return (
-    <div>
+    <main>
       <MainHeroSection />
-      <ApiSection />
-      <LevelTestSection />
-    </div>
+      <FeatureSection />
+      {/* <LevelTestSection /> */}
+    </main>
   );
 }
