@@ -23,9 +23,9 @@ export default function Header() {
 
   const navItems = [
     { label: "홈", href: "/" },
-    { label: "튜터 소개", href: "/tutors" },
+    // { label: "튜터 소개", href: "/tutors" },
     { label: "AI 레벨테스트", href: "/level-test" },
-    { label: "커뮤니티", href: "/community" },
+    // { label: "커뮤니티", href: "/community" },
   ];
 
   return (
