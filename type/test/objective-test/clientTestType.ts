@@ -17,12 +17,7 @@ export function getCLevelByNumber(num: number): CLevel {
   return level;
 }
 
-export type CTestType =
-  | "Grammar"
-  | "Vocabulary"
-  | "Pronunciation"
-  | "Fluency"
-  | "Coherence";
+export type CTestType = "Grammar" | "Vocabulary";
 
 export interface CGrammarTestAnswer {
   id: string;
@@ -35,4 +30,9 @@ export interface CGrammarTest {
   level: CLevel;
   type: CTestType;
   answers: CGrammarTestAnswer[];
+}
+
+export interface ObjectiveTestResult {
+  grammar: number;
+  vocabulary: number;
 }

@@ -1,60 +1,54 @@
 "use client";
 
 import { useEffect } from "react";
-import { motion, useAnimation } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { BotIcon, MicIcon, EndSessionIcon } from "@/app/styles/icons";
 import { useHandlerAccess } from "@/app/level-test/step/aiTutorApi/useHandlerAccess";
-import { useSpeechHandler } from "@/app/level-test/step/aiTutorApi/useSpeechHandler";
+import { useAudioRecorder } from "@/app/level-test/step/aiTutorApi/useAudioRecorder";
 import { StatusIndicator } from "@/app/level-test/step/aiTutorApi/StatusIndicator";
+import { CConversationStatus } from "@/type/test/speak-test/clientAiType";
 
 interface Prop {
   onSubmitSpeech: () => void;
 }
 
 export default function Step4({ onSubmitSpeech }: Prop) {
-  const { status, reply, error, handleUserInput } = useHandlerAccess();
-  const { transcript, listening, startListening, stopListening } =
-    useSpeechHandler(handleUserInput);
+  const { status, setStatus, reply, error, handleAudioInput } =
+    useHandlerAccess();
+  const { recording, startRecording, stopRecording, audioBlob, setAudioBlob } =
+    useAudioRecorder();
 
-  const controls = useAnimation();
-
-  // 🔹 AI가 말할 때 아이콘이 계속 커졌다 작아졌다 반복하도록
   useEffect(() => {
-    if (Array.isArray(reply) && reply.length > 0) {
-      controls.start({
-        scale: [1, 1.15, 1],
-        transition: {
-          duration: 1.2,
-          ease: "easeInOut",
-          repeat: Infinity, // 반복
-          repeatType: "mirror",
-        },
-      });
-    } else {
-      // 🔹 AI가 말하지 않을 때 원상복구
-      controls.start({
-        scale: 1,
-        transition: { duration: 0.4, ease: "easeOut" },
-      });
+    if (audioBlob) {
+      handleAudioInput(audioBlob);
+      setAudioBlob(null);
     }
-  }, [reply, controls]);
+  }, [audioBlob, handleAudioInput, setAudioBlob]);
+
+  useEffect(() => {
+    if (recording) setStatus(CConversationStatus.LISTENING);
+  }, [recording]);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="text-center px-8 py-12 rounded-3xl border border-[var(--brand)]/10 bg-[var(--bg)] shadow-[0_4px_40px_rgba(74,144,226,0.08)] max-w-2xl mx-auto"
+      transition={{ duration: 0.6 }}
+      className="text-center px-8 py-10 rounded-3xl border border-[var(--brand)]/10 bg-[var(--bg)] shadow-[0_4px_40px_rgba(74,144,226,0.08)] max-w-2xl mx-auto"
     >
-      {/* 🔹 AI 아바타 + 상태 */}
+      <p className="text-sm text-[var(--text-light)] mb-6 leading-relaxed">
+        {recording
+          ? "지금 말씀하세요! 완료되면 ‘정지’ 버튼을 눌러주세요."
+          : "‘시작’ 버튼을 누르고 말한 후, 완료되면 ‘정지’ 버튼을 눌러주세요."}
+      </p>
+
       <div className="flex flex-col items-center justify-center mb-10">
         <motion.div
-          animate={controls}
           className={`p-8 rounded-full border border-[var(--brand)]/20 shadow-[0_0_25px_rgba(74,144,226,0.15)]
             bg-gradient-to-br from-[var(--brand)]/10 to-sky-400/5 transition-all duration-500
             ${
-              listening
-                ? "scale-105 shadow-[0_0_30px_rgba(74,144,226,0.3)]"
+              recording
+                ? "scale-105 shadow-[0_0_40px_rgba(74,144,226,0.4)]"
                 : ""
             }
           `}
@@ -64,65 +58,79 @@ export default function Step4({ onSubmitSpeech }: Prop) {
 
         <p
           className={`mt-6 text-base font-medium tracking-wide transition-colors duration-300 ${
-            listening ? "text-sky-400" : "text-[var(--text-light)]"
+            recording ? "text-sky-400" : "text-[var(--text-light)]"
           }`}
         >
-          {listening ? "🎙️ Listening..." : "✅ Connected"}
+          {StatusIndicator({ status, error })}
         </p>
-
-        <div className="mt-3">{StatusIndicator({ status, error })}</div>
       </div>
 
-      {/* 🔹 대화 카드 영역 */}
       <div className="bg-[var(--sub)] rounded-2xl p-6 border border-[var(--brand)]/10 shadow-inner text-left max-h-72 overflow-y-auto mb-10">
-        {transcript && (
-          <p className="text-[var(--text)] text-lg italic mb-4">
-            “{transcript}”
-          </p>
-        )}
-
-        {Array.isArray(reply) &&
-          reply.length > 0 &&
-          reply[reply.length - 1]?.reply && (
-            <p className="bg-gradient-to-r from-[var(--brand)] to-sky-400 bg-clip-text text-transparent text-lg italic font-medium">
-              “{reply[reply.length - 1].reply}”
-            </p>
+        <AnimatePresence mode="wait">
+          {reply.length > 0 ? (
+            <motion.div
+              key={reply[reply.length - 1].reply}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+              className="flex items-start gap-3"
+            >
+              <div className="flex-shrink-0 mt-1">
+                <BotIcon className="w-7 h-7 text-[var(--brand)] opacity-80" />
+              </div>
+              <div className="bg-gradient-to-r from-[var(--brand)]/10 to-sky-400/10 text-[var(--text)] border border-[var(--brand)]/10 px-4 py-3 rounded-2xl shadow-sm">
+                <p className="text-base leading-relaxed">
+                  “{reply[reply.length - 1].reply}”
+                </p>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.p
+              key="guide"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-[var(--text-light)] italic text-center"
+            >
+              아직 대화가 없습니다. ‘시작’ 버튼을 눌러 말을 시작하세요.
+            </motion.p>
           )}
-
-        {!reply.length && !transcript && (
-          <p className="text-[var(--text-light)] italic text-center">
-            🎧 AI가 준비 중이에요. “Start” 버튼을 눌러 대화를 시작하세요.
-          </p>
-        )}
+        </AnimatePresence>
       </div>
 
-      {/* 🔹 버튼 영역 */}
       <div className="flex items-center justify-center gap-12">
-        {/* 🎤 녹음 버튼 */}
         <motion.button
-          onClick={listening ? stopListening : startListening}
+          onClick={recording ? stopRecording : startRecording}
           whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          className={`flex items-center justify-center w-20 h-20 rounded-full shadow-md text-white text-lg font-medium transition-all duration-300
+          className={`flex flex-col items-center justify-center w-24 h-24 rounded-full shadow-lg text-white font-semibold transition-all duration-300
             ${
-              listening
+              recording
                 ? "bg-gradient-to-br from-red-500 to-red-600 hover:brightness-110 shadow-[0_0_25px_rgba(239,68,68,0.5)]"
                 : "bg-gradient-to-r from-[var(--brand)] to-sky-400 hover:brightness-110 shadow-[0_0_25px_rgba(74,144,226,0.4)]"
             }`}
         >
-          <MicIcon className="w-10 h-10" />
+          <MicIcon className="w-8 h-8 mb-1" />
+          {recording ? "정지" : "시작"}
         </motion.button>
 
-        {/* 🔴 종료 버튼 */}
         <motion.button
           onClick={onSubmitSpeech}
           whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          className="flex items-center justify-center w-20 h-20 rounded-full bg-[var(--sub)] border border-[var(--brand)]/30 text-[var(--brand)] hover:bg-red-100 hover:border-red-400 hover:text-red-500 transition-all duration-300"
+          className="flex flex-col items-center justify-center w-24 h-24 rounded-full bg-[var(--sub)] border border-[var(--brand)]/30 text-[var(--brand)] hover:bg-red-50 hover:border-red-400 hover:text-red-500 transition-all duration-300"
         >
-          <EndSessionIcon className="w-9 h-9 rotate-[135deg]" />
+          <EndSessionIcon className="w-7 h-7 rotate-[135deg]" />
+          <span className="text-xs mt-1">종료</span>
         </motion.button>
       </div>
+
+      <p className="text-xs text-gray-400 mt-6">
+        TIP: 주변이 조용한 곳에서 참여하면 더 좋습니다.
+      </p>
     </motion.div>
   );
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SGrammarTest } from "@/type/server/serverGrammerTestAnswer";
-import { CApiResponse } from "@/type/client/clientApiResponse";
+import { CApiResponse } from "@/type/clientApiResponse";
 import { createServerApiHandler } from "@/app/api/serverApiFactory";
+import { SGrammarTest } from "@/type/test/objective-test/serverTestTyoe";
 
 const baseHandler = createServerApiHandler<SGrammarTest>(
   "GET",
