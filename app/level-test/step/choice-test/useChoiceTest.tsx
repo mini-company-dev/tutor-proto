@@ -12,12 +12,21 @@ import {
 import { useEffect, useMemo, useState } from "react";
 
 interface Prop {
-  step: number;
-  nextStep: () => void;
+  count: number;
+  nextCount: () => void;
   type: CTestType;
 }
 
-export default function useChoiceTest({ step, nextStep, type }: Prop) {
+const levelMap: Record<string, number> = {
+  A1: 1,
+  A2: 2,
+  B1: 3,
+  B2: 4,
+  C1: 5,
+  C2: 6,
+};
+
+export default function useChoiceTest({ count, nextCount, type }: Prop) {
   const [level, setLevel] = useState(3);
   const [score, setScore] = useState(0);
   const [tests, setTests] = useState<CGrammarTest[]>([]);
@@ -25,7 +34,7 @@ export default function useChoiceTest({ step, nextStep, type }: Prop) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const currentTest = useMemo(() => tests[step - 1], [tests, step]);
+  const currentTest = useMemo(() => tests[count - 1], [tests, count]);
 
   useEffect(() => {
     if (!type) return;
@@ -41,7 +50,7 @@ export default function useChoiceTest({ step, nextStep, type }: Prop) {
 
         if (Array.isArray(res.payload) && res.payload.length > 0) {
           setTests((prev) => {
-            const before = prev.slice(0, step + 1); // step 이후부터 새로 교체
+            const before = prev.slice(0, count + 1);
             return [...before, ...(res.payload ?? [])];
           });
         } else {
@@ -60,36 +69,47 @@ export default function useChoiceTest({ step, nextStep, type }: Prop) {
     fetchTests();
   }, [level, type]);
 
+  useEffect(() => {
+    console.log(tests);
+  }, [tests]);
+
   const onSubmitAnswer = async (answerId: string) => {
     const res = await gradingTestAnswerById(currentTest.id, answerId);
 
     if (res.payload) {
-      updateScore();
+      updateScore(level);
     }
 
-    if (getIsUpgrade(step)) {
-      setLevel((prev) => calculateNextLevel(prev, step, score));
+    if (getIsUpgrade(count)) {
+      setLevel((prev) => calculateNextLevel(prev, count, score));
     }
 
-    nextStep();
+    nextCount();
   };
 
-  const updateScore = () => {
+  const updateScore = (level: number) => {
     const lv = getCLevelByNumber(level);
-    const inc =
-      lv === "A1"
-        ? 1
-        : lv === "A2"
-        ? 2
-        : lv === "B1"
-        ? 3
-        : lv === "B2"
-        ? 4
-        : lv === "C1"
-        ? 5
-        : lv === "C2"
-        ? 6
-        : 0;
+    let inc = 0;
+    switch (lv) {
+      case "A1":
+        inc = 1;
+        break;
+      case "A2":
+        inc = 2;
+        break;
+      case "B1":
+        inc = 3;
+        break;
+      case "B2":
+        inc = 4;
+        break;
+      case "C1":
+        inc = 5;
+        break;
+      case "C2":
+        inc = 6;
+        break;
+    }
 
     setScore((prev) => prev + inc);
   };

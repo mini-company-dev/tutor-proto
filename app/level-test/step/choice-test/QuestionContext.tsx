@@ -2,16 +2,16 @@ import { CGrammarTest } from "@/type/test/objective-test/clientTestType";
 import { motion } from "framer-motion";
 
 interface Prop {
-  step: number;
+  count: number;
   test: CGrammarTest;
   onSubmitAnswer: (id: string) => void;
 }
 
-export const QuestionCard = ({ step, test, onSubmitAnswer }: Prop) => {
+export const QuestionContext = ({ count, test, onSubmitAnswer }: Prop) => {
   return (
     <div className="rounded-2xl p-6 bg-[var(--sub)] border border-[var(--brand)]/10 shadow-inner">
       <p className="text-lg font-semibold mb-4 bg-gradient-to-r from-[var(--brand)] to-sky-400 text-transparent bg-clip-text">
-        Q{step}. Choose the correct option:
+        Q{count}. Choose the correct option:
       </p>
 
       <p className="text-[1.05rem] leading-relaxed mb-6 text-[var(--text)]">
