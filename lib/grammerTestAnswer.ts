@@ -1,10 +1,10 @@
-import { CApiResponse } from "@/type/client/clientApiResponse";
+import { CApiResponse } from "@/type/clientApiResponse";
+import { requestApi } from "./apiFactory";
 import {
   CGrammarTest,
   CLevel,
   CTestType,
-} from "@/type/client/clientGrammerTestAnswer";
-import { requestApi } from "./apiFactory";
+} from "@/type/test/objective-test/clientTestType";
 
 export async function getGrammerTestAnswerByLevel(
   level: CLevel,

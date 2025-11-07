@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios, { AxiosRequestConfig, Method } from "axios";
-import { SApiResponse } from "@/type/server/serverApiResponse";
-import { CApiResponse } from "@/type/client/clientApiResponse";
+import { SApiResponse } from "@/type/serverApiResponse";
+import { CApiResponse } from "@/type/clientApiResponse";
 import { getCached, setCached } from "@/lib/cache";
 
 export function createServerApiHandler<T>(
@@ -24,7 +24,6 @@ export function createServerApiHandler<T>(
       if (cacheKey) {
         const cached = getCached(buildCacheKey(cacheKey, id));
         if (cached) {
-          console.log("CACHE");
           return apiSuccessHandler<T>(cached);
         }
       }

@@ -1,8 +1,8 @@
-import { SGrammarTest } from "@/type/server/serverGrammerTestAnswer";
 import { buildCacheKey, createServerApiHandler } from "../serverApiFactory";
 import { NextRequest, NextResponse } from "next/server";
-import { CApiResponse } from "@/type/client/clientApiResponse";
+import { CApiResponse } from "@/type/clientApiResponse";
 import { getCached, setCached } from "@/lib/cache";
+import { SGrammarTest } from "@/type/test/objective-test/serverTestTyoe";
 
 const baseHandler = createServerApiHandler<SGrammarTest[]>("GET", "/api/tests");
 

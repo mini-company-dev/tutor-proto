@@ -1,25 +1,44 @@
 "use client";
 
-import Step1 from "./step/step1";
-import Step2 from "./step/step2";
+import StartStep from "./step/startStep";
+import TestStep from "./step/TestStep";
 import Step3 from "./step/step3";
 import Step4 from "./step/step4";
 import Step5 from "./step/step5";
 import useLevelTest from "./step/useLevelTest";
 
 export default function LevelTest() {
-  const { step, nextStep, getTest, onSubmitAnswer, onSubmitSpeech } =
-    useLevelTest();
+  const { step, nextStep } = useLevelTest();
 
-  return (
-    <>
-      {step === 0 && <Step1 nextStep={nextStep} />}
-      {step >= 1 && step <= 10 && (
-        <Step2 step={step} test={getTest()} onSubmitAnswer={onSubmitAnswer} />
-      )}
-      {step === 11 && <Step3 nextStep={nextStep} />}
-      {step === 12 && <Step4 onSubmitSpeech={onSubmitSpeech} />}
-      {step === 13 && <Step5 nextStep={nextStep} />}
-    </>
-  );
+  switch (true) {
+    case step === 0:
+      return <StartStep nextStep={nextStep} />;
+    case step >= 1 && step <= 10:
+      return (
+        <TestStep
+          step={step}
+          nextStep={nextStep}
+          type={"Grammar"}
+          label="1차 문법 테스트"
+        />
+      );
+    case step >= 11 && step <= 20:
+      return
+        <TestStep
+          step={step}
+          nextStep={nextStep}
+          type={"Vocabulary"}
+          label="2차 문법 테스트"
+        />
+    case step === 21:
+      return <Step3 nextStep={nextStep} />;
+    case step === 22:
+      return <Step4 step={step} nextStep={nextStep} />;
+    case step > 22:
+      return <Step5 nextStep={nextStep} />;
+
+    // 기본값 (혹시 step이 잘못 들어온 경우)
+    default:
+      return null;
+  }
 }

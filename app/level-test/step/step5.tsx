@@ -9,9 +9,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
-import { EvaluationMetrics } from "@/type/types";
 import { EndSessionIcon } from "@/app/styles/icons";
 import AiBot from "@/components/ui/aiBot"; // 🔹 재사용 (AI 아이콘)
+import { EvaluationMetrics } from "@/type/test/tutorTypes";
 
 interface Prop {
   evaluation?: EvaluationMetrics;

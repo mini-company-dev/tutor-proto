@@ -1,4 +1,4 @@
-import { CApiResponse } from "@/type/client/clientApiResponse";
+import { CApiResponse } from "@/type/clientApiResponse";
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios";
 
 export async function requestApi<T>(

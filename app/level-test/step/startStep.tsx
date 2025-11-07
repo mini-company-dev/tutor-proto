@@ -8,7 +8,7 @@ interface Prop {
   nextStep: () => void;
 }
 
-export default function Step1({ nextStep }: Prop) {
+export default function StartStep({ nextStep }: Prop) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
