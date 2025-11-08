@@ -9,10 +9,10 @@ import { StatusIndicator } from "@/app/level-test/step/aiTutorApi/StatusIndicato
 import { CConversationStatus } from "@/type/test/speak-test/clientAiType";
 
 interface Prop {
-  onSubmitSpeech: () => void;
+  nextStep: () => void;
 }
 
-export default function Step4({ onSubmitSpeech }: Prop) {
+export default function SpeakStep({ nextStep }: Prop) {
   const { status, setStatus, reply, error, handleAudioInput } =
     useHandlerAccess();
   const { recording, startRecording, stopRecording, audioBlob, setAudioBlob } =
@@ -117,7 +117,7 @@ export default function Step4({ onSubmitSpeech }: Prop) {
         </motion.button>
 
         <motion.button
-          onClick={onSubmitSpeech}
+          onClick={nextStep}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           transition={{ duration: 0.2 }}

@@ -10,12 +10,17 @@ import { useState } from "react";
 interface Prop {
   type: CTestType;
   label: string;
+  nextStep: () => void;
 }
 
-export default function QuestionSection({ type, label }: Prop) {
+export default function QuestionSection({ type, label, nextStep }: Prop) {
   const [count, setCount] = useState(1);
 
   const nextCount = () => {
+    if (count === 15) {
+      nextStep();
+      return;
+    }
     setCount(count + 1);
   };
 
@@ -26,7 +31,7 @@ export default function QuestionSection({ type, label }: Prop) {
   });
 
   const test = getTest();
-  
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
