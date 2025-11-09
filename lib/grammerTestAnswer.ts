@@ -2,6 +2,7 @@ import { CApiResponse } from "@/type/clientApiResponse";
 import { requestApi } from "./apiFactory";
 import {
   CGrammarTest,
+  CGrammarTestResult,
   CLevel,
   CTestType,
 } from "@/type/test/objective-test/clientTestType";
@@ -25,8 +26,8 @@ export async function getGrammerTestAnswerById(
 export async function gradingTestAnswerById(
   id: string,
   answerId: string
-): Promise<CApiResponse<boolean>> {
-  return requestApi<boolean>(
+): Promise<CApiResponse<CGrammarTestResult>> {
+  return requestApi<CGrammarTestResult>(
     "GET",
     `/api/test/grading/${id}?answer=${answerId}`
   );

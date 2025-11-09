@@ -6,16 +6,18 @@ import SpeakStartStep from "./step/SpeakStartStep";
 import useLevelTest from "./step/useLevelTest";
 import GrammarMiddleStep from "./step/GrammerMiddleStep";
 import SpeakStep from "./step/SpeakStep";
+import Step5 from "./step/step5";
 
 export default function LevelTest() {
   const {
     step,
+    scores,
     nextStep,
-    updateGrammar,
-    updateVocabulary,
-    updatePronunciation,
-    updateFluency,
-    updateCoherence,
+    updateScoreGrammar,
+    updateScoreVocabulary,
+    updateScorePronunciation,
+    updateScoreFluency,
+    updateScoreCoherence,
   } = useLevelTest();
 
   switch (step) {
@@ -27,6 +29,7 @@ export default function LevelTest() {
           nextStep={nextStep}
           type={"Grammar"}
           label="1차 문법 테스트"
+          updateScore={updateScoreGrammar}
         />
       );
     case 2:
@@ -37,14 +40,22 @@ export default function LevelTest() {
           nextStep={nextStep}
           type={"Vocabulary"}
           label="2차 문법 테스트"
+          updateScore={updateScoreVocabulary}
         />
       );
     case 4:
       return <SpeakStartStep nextStep={nextStep} />;
     case 5:
-      return <SpeakStep nextStep={nextStep} />;
-    // case 5:
-    //   return <Step5 nextStep={nextStep} />;
+      return (
+        <SpeakStep
+          nextStep={nextStep}
+          updateScorePronunciation={updateScorePronunciation}
+          updateScoreFluency={updateScoreFluency}
+          updateScoreCoherence={updateScoreCoherence}
+        />
+      );
+    case 6:
+      return <Step5 score={scores} nextStep={nextStep} />;
 
     // 기본값 (혹시 step이 잘못 들어온 경우)
     default:

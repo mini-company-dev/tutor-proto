@@ -99,15 +99,15 @@ const buildPrompt = (history: History[]): string => {
         You will receive the user's voice input (not text). Listen carefully,
         understand what they said, and respond naturally in English (1–3 sentences).
 
-        After replying, objectively evaluate their spoken English on the following five metrics (1–100):
+        After replying, objectively evaluate their spoken English on the following five metrics (0–5):
 
         
         {
             "user": string,            // The exact English transcription of what the user said
             "reply": string,           // The AI's natural English response to the user's speech (1–3 sentences)
-            "pronunciation": number,   // Pronunciation quality score (1–100) — clarity and correctness of spoken sounds
-            "fluency": number,         // Fluency score (1–100) — smoothness, rhythm, and natural speed of speech
-            "coherence": number        // Coherence score (1–100) — how logically and clearly the ideas are connected
+            "pronunciation": number,   // Pronunciation quality score (0–5) — clarity and correctness of spoken sounds
+            "fluency": number,         // Fluency score (0–5) — smoothness, rhythm, and natural speed of speech
+            "coherence": number        // Coherence score (0–5) — how logically and clearly the ideas are connected
         }
 
 

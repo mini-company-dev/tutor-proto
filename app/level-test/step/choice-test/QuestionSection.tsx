@@ -11,9 +11,10 @@ interface Prop {
   type: CTestType;
   label: string;
   nextStep: () => void;
+  updateScore: (addScore: number, sentence: string) => void;
 }
 
-export default function QuestionSection({ type, label, nextStep }: Prop) {
+export default function QuestionSection({ type, label, nextStep, updateScore }: Prop) {
   const [count, setCount] = useState(1);
 
   const nextCount = () => {
@@ -28,6 +29,7 @@ export default function QuestionSection({ type, label, nextStep }: Prop) {
     count,
     nextCount,
     type,
+    globalScoreUpdate: updateScore
   });
 
   const test = getTest();

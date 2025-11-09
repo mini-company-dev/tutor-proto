@@ -3,51 +3,32 @@ import { geminiByText } from "@/app/service/geminiByText";
 import { geminiByFile } from "@/app/service/geminiByFile";
 import {
   ReplyEntry,
-  TutorSpeakEvaluation,
+  TutorResponse,
 } from "@/type/test/speak-test/tutorSpeakTypes";
 import { CConversationStatus } from "@/type/test/speak-test/clientAiType";
 
-export const useHandlerAccess = () => {
+export const useHandlerAccess = (
+  updateScorePronunciation: (addScore: number, sentence: string) => void,
+  updateScoreFluency: (addScore: number, sentence: string) => void,
+  updateScoreCoherence: (addScore: number, sentence: string) => void
+) => {
   const [status, setStatus] = useState<CConversationStatus>(
     CConversationStatus.IDLE
   );
   const [reply, setReply] = useState<ReplyEntry[]>([]);
-  const [evaluation, setEvaluation] = useState<TutorSpeakEvaluation>({
-    pronunciation: 0,
-    fluency: 0,
-    coherence: 0,
-  });
-
   const [error, setError] = useState<string | null>(null);
-
   const transcriptEndRef = useRef<HTMLDivElement>(null);
   const replyRef = useRef<ReplyEntry[]>([]);
-  const evaluationCount = useRef(0);
 
   useEffect(() => {
     replyRef.current = reply;
   }, [reply]);
 
-  const updateEvaluation = (newEval: TutorSpeakEvaluation) => {
-    evaluationCount.current += 1;
-    const n = evaluationCount.current;
-
-    setEvaluation((prev) => ({
-      pronunciation:
-        newEval.pronunciation !== 0
-          ? (prev.pronunciation * (n - 1) + newEval.pronunciation) / n
-          : prev.pronunciation,
-
-      fluency:
-        newEval.fluency !== 0
-          ? (prev.fluency * (n - 1) + newEval.fluency) / n
-          : prev.fluency,
-
-      coherence:
-        newEval.coherence !== 0
-          ? (prev.coherence * (n - 1) + newEval.coherence) / n
-          : prev.coherence,
-    }));
+  const updateEvaluation = (res: TutorResponse) => {
+    console.log(res);
+    updateScorePronunciation(res.pronunciation, res.user);
+    updateScoreFluency(res.fluency, res.user);
+    updateScoreCoherence(res.coherence, res.user);
   };
 
   const handleUserInput = useCallback(async (userText: string) => {
@@ -87,7 +68,6 @@ export const useHandlerAccess = () => {
     status,
     setStatus,
     reply,
-    evaluation,
     error,
     transcriptEndRef,
     handleUserInput,

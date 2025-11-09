@@ -36,3 +36,11 @@ export interface ObjectiveTestResult {
   grammar: number;
   vocabulary: number;
 }
+
+export interface CGrammarTestResult {
+  id: string;
+  problem: string;
+  level: CLevel;
+  answers: string;
+  isGraded: boolean;
+}

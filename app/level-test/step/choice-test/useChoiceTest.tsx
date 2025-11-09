@@ -15,6 +15,7 @@ interface Prop {
   count: number;
   nextCount: () => void;
   type: CTestType;
+  globalScoreUpdate: (addScore: number, sentence: string) => void;
 }
 
 const levelMap: Record<string, number> = {
@@ -26,9 +27,15 @@ const levelMap: Record<string, number> = {
   C2: 6,
 };
 
-export default function useChoiceTest({ count, nextCount, type }: Prop) {
+export default function useChoiceTest({
+  count,
+  nextCount,
+  type,
+  globalScoreUpdate,
+}: Prop) {
   const [level, setLevel] = useState(3);
-  const [score, setScore] = useState(0);
+  const [levelCorrectCount, setLevelCorrectCount] = useState(0);
+  const [levelCount, setLevelCount] = useState(0);
   const [tests, setTests] = useState<CGrammarTest[]>([]);
 
   const [loading, setLoading] = useState(true);
@@ -53,6 +60,8 @@ export default function useChoiceTest({ count, nextCount, type }: Prop) {
             const before = prev.slice(0, count + 1);
             return [...before, ...(res.payload ?? [])];
           });
+          setLevelCount(0);
+          setLevelCorrectCount(0);
         } else {
           setTests([]);
           console.warn("불러올 문제가 없습니다.", { level, type });
@@ -69,49 +78,42 @@ export default function useChoiceTest({ count, nextCount, type }: Prop) {
     fetchTests();
   }, [level, type]);
 
-  useEffect(() => {
-    console.log(tests);
-  }, [tests]);
-
   const onSubmitAnswer = async (answerId: string) => {
     const res = await gradingTestAnswerById(currentTest.id, answerId);
+    setLevelCount(levelCount + 1);
 
-    if (res.payload) {
-      updateScore(level);
+    if(res.payload) {
+      const sentence = res.payload.problem;
+      const answer = res.payload.answers;
+      const fullSentence = sentence.replace("___", answer)
+
+      if (res.payload?.isGraded) {
+        const score = getScoreByLevel(level);
+        globalScoreUpdate(score, fullSentence);
+        setLevelCorrectCount(levelCorrectCount + 1);
+      } else {
+        globalScoreUpdate(0, fullSentence);
+      }
     }
 
-    if (getIsUpgrade(count)) {
-      setLevel((prev) => calculateNextLevel(prev, count, score));
+    if (getIsUpgrade(levelCount)) {
+      setLevel((prev) => calculateNextLevel(prev, levelCorrectCount));
     }
 
     nextCount();
   };
 
-  const updateScore = (level: number) => {
+  const getScoreByLevel = (level: number): number => {
     const lv = getCLevelByNumber(level);
-    let inc = 0;
-    switch (lv) {
-      case "A1":
-        inc = 1;
-        break;
-      case "A2":
-        inc = 2;
-        break;
-      case "B1":
-        inc = 3;
-        break;
-      case "B2":
-        inc = 4;
-        break;
-      case "C1":
-        inc = 5;
-        break;
-      case "C2":
-        inc = 6;
-        break;
-    }
-
-    setScore((prev) => prev + inc);
+    const map: Record<string, number> = {
+      A1: 1,
+      A2: 2,
+      B1: 3,
+      B2: 4,
+      C1: 5,
+      C2: 6,
+    };
+    return map[lv] ?? 0;
   };
 
   return {
@@ -126,9 +128,9 @@ const getIsUpgrade = (step: number): boolean => step % 3 === 0;
 
 const calculateNextLevel = (
   prevLevel: number,
-  step: number,
-  score: number
+  levelCorrectCount: number
 ): number => {
-  const ratio = (score + 1) / (step + 1);
-  return ratio >= 2 ? prevLevel + 1 : Math.max(1, prevLevel - 1);
+  return levelCorrectCount >= 2
+    ? prevLevel + 1
+    : Math.max(1, prevLevel - 1);
 };

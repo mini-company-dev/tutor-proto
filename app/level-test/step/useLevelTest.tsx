@@ -1,59 +1,60 @@
 "use client";
 
-import { CEvaluationMetrics } from "@/type/test/globalScore";
+import { CEvaluationMetricsExtended } from "@/type/test/globalScore";
 import { useState } from "react";
-
-interface CEvaluationMetricDetail {
-  score: number;
-  count: number;
-}
-
-type CEvaluationMetricsExtended = {
-  [K in keyof CEvaluationMetrics]: CEvaluationMetricDetail;
-};
 
 export default function useLevelTest() {
   const [step, setStep] = useState(0);
   const [scores, setScores] = useState<CEvaluationMetricsExtended>({
-    grammar: { score: 0, count: 0 },
-    vocabulary: { score: 0, count: 0 },
-    pronunciation: { score: 0, count: 0 },
-    fluency: { score: 0, count: 0 },
-    coherence: { score: 0, count: 0 },
+    grammar: { score: 0, count: 0, sentence: [] },
+    vocabulary: { score: 0, count: 0, sentence: [] },
+    pronunciation: { score: 0, count: 0, sentence: [] },
+    fluency: { score: 0, count: 0, sentence: [] },
+    coherence: { score: 0, count: 0, sentence: [] },
   });
 
-  const updateScore = (data: number, score: number, count: number) => {
-    let allSocre = score * count;
-    allSocre += data;
-    count++;
-    return { score, count };
+  const updateScore = (addScore: number, score: number, count: number) => {
+    const total = score * count + addScore;
+    const newCount = count + 1;
+    const newScore = total / newCount;
+
+    return { score: newScore, count: newCount };
   };
 
   const createUpdater = <K extends keyof CEvaluationMetricsExtended>(
     key: K
   ) => {
-    return (data: number) => {
+    return (addScore: number, sentence: string) => {
       setScores((prev) => {
-        const { score, count } = prev[key];
-        const updated = updateScore(data, score, count);
-        return { ...prev, [key]: updated };
+        const { score, count, sentence: prevSentences } = prev[key];
+        const { score: newScore, count: newCount } = updateScore(
+          addScore,
+          score,
+          count
+        );
+        return {
+          ...prev,
+          [key]: {
+            score: newScore,
+            count: newCount,
+            sentence: [...prevSentences, sentence],
+          },
+        };
       });
     };
   };
 
-  const nextStep = () => {
-    setStep(step + 1);
-  };
+  const nextStep = () => setStep((prev) => prev + 1);
 
   return {
     step,
     nextStep,
     scores,
-    updateGrammar: createUpdater("grammar"),
-    updateVocabulary: createUpdater("vocabulary"),
-    updatePronunciation: createUpdater("pronunciation"),
-    updateFluency: createUpdater("fluency"),
-    updateCoherence: createUpdater("coherence"),
-    updateMetric: createUpdater,
+    updateScoreGrammar: createUpdater("grammar"),
+    updateScoreVocabulary: createUpdater("vocabulary"),
+    updateScorePronunciation: createUpdater("pronunciation"),
+    updateScoreFluency: createUpdater("fluency"),
+    updateScoreCoherence: createUpdater("coherence"),
+    updateScoreMetric: createUpdater,
   };
 }
