@@ -9,12 +9,24 @@ import { StatusIndicator } from "@/app/level-test/step/aiTutorApi/StatusIndicato
 import { CConversationStatus } from "@/type/test/speak-test/clientAiType";
 
 interface Prop {
-  onSubmitSpeech: () => void;
+  nextStep: () => void;
+  updateScorePronunciation: (addScore: number, sentence: string) => void;
+  updateScoreFluency: (addScore: number, sentence: string) => void;
+  updateScoreCoherence: (addScore: number, sentence: string) => void;
 }
 
-export default function Step4({ onSubmitSpeech }: Prop) {
+export default function SpeakStep({
+  nextStep,
+  updateScorePronunciation,
+  updateScoreFluency,
+  updateScoreCoherence,
+}: Prop) {
   const { status, setStatus, reply, error, handleAudioInput } =
-    useHandlerAccess();
+    useHandlerAccess(
+      updateScorePronunciation,
+      updateScoreFluency,
+      updateScoreCoherence
+    );
   const { recording, startRecording, stopRecording, audioBlob, setAudioBlob } =
     useAudioRecorder();
 
@@ -56,13 +68,13 @@ export default function Step4({ onSubmitSpeech }: Prop) {
           <BotIcon className="w-16 h-16 text-[var(--brand)] drop-shadow-[0_0_10px_rgba(74,144,226,0.3)]" />
         </motion.div>
 
-        <p
+        <div
           className={`mt-6 text-base font-medium tracking-wide transition-colors duration-300 ${
             recording ? "text-sky-400" : "text-[var(--text-light)]"
           }`}
         >
           {StatusIndicator({ status, error })}
-        </p>
+        </div>
       </div>
 
       <div className="bg-[var(--sub)] rounded-2xl p-6 border border-[var(--brand)]/10 shadow-inner text-left max-h-72 overflow-y-auto mb-10">
@@ -117,7 +129,7 @@ export default function Step4({ onSubmitSpeech }: Prop) {
         </motion.button>
 
         <motion.button
-          onClick={onSubmitSpeech}
+          onClick={nextStep}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           transition={{ duration: 0.2 }}

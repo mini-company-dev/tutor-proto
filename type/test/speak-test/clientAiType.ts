@@ -1,6 +1,3 @@
-import { ObjectiveTestResult } from "../objective-test/clientTestType";
-import { TutorSpeakEvaluation } from "./tutorSpeakTypes";
-
 export enum CConversationStatus {
   IDLE,
   CONNECTING,
@@ -9,7 +6,3 @@ export enum CConversationStatus {
   ASSESSMENT_READY,
   ERROR,
 }
-
-export interface CEvaluationMetrics
-  extends TutorSpeakEvaluation,
-    ObjectiveTestResult {}
