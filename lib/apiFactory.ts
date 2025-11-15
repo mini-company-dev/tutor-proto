@@ -1,4 +1,4 @@
-import { CApiResponse } from "@/type/clientApiResponse";
+import { ClientResponse } from "@/type/clientResponse";
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios";
 
 export async function requestApi<T>(
@@ -6,27 +6,41 @@ export async function requestApi<T>(
   url: string,
   data?: any,
   config?: AxiosRequestConfig
-): Promise<CApiResponse<T>> {
+): Promise<ClientResponse<T>> {
   try {
-    const res: AxiosResponse<CApiResponse<T>> = await axios.request({
+    const isFormData = data instanceof FormData;
+
+    const headers: Record<string, any> = {
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
+      ...(config?.headers || {}),
+    };
+
+    const res: AxiosResponse<ClientResponse<T>> = await axios.request({
       method,
       url,
       data,
-      headers: { "Content-Type": "application/json" },
+      headers,
+      validateStatus: () => true,
       ...config,
     });
 
     if (res && res.data) {
       return res.data;
     }
+
     return {
       payload: undefined,
       explanation: "요청 실패",
     };
-  } catch (error: any) {
+  } catch (err: any) {
+    console.error("requestApi Error:", err);
+
+    const explanation =
+      err?.response?.data?.message ?? err?.message ?? "서버 요청 오류";
+
     return {
       payload: undefined,
-      explanation: "요청 실패",
+      explanation,
     };
   }
 }

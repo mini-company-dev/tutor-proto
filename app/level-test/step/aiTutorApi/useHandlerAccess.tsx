@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { geminiByText } from "@/app/service/geminiByText";
-import { geminiByFile } from "@/app/service/geminiByFile";
 import {
   ReplyEntry,
   TutorResponse,
 } from "@/type/test/speak-test/tutorSpeakTypes";
-import { CConversationStatus } from "@/type/test/speak-test/clientAiType";
+import { ConversationStatus } from "@/type/test/speak-test/clientAiType";
+import { speakByFile } from "@/lib/geminiSpeak";
+import speakText from "@/app/service/geminiSpeak";
 
 export const useHandlerAccess = (
   updateScorePronunciation: (addScore: number, sentence: string) => void,
   updateScoreFluency: (addScore: number, sentence: string) => void,
   updateScoreCoherence: (addScore: number, sentence: string) => void
 ) => {
-  const [status, setStatus] = useState<CConversationStatus>(
-    CConversationStatus.IDLE
+  const [status, setStatus] = useState<ConversationStatus>(
+    ConversationStatus.IDLE
   );
   const [reply, setReply] = useState<ReplyEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -25,42 +25,27 @@ export const useHandlerAccess = (
   }, [reply]);
 
   const updateEvaluation = (res: TutorResponse) => {
-    console.log(res);
     updateScorePronunciation(res.pronunciation, res.user);
     updateScoreFluency(res.fluency, res.user);
     updateScoreCoherence(res.coherence, res.user);
   };
 
-  const handleUserInput = useCallback(async (userText: string) => {
-    if (!userText.trim()) return;
-    setStatus(CConversationStatus.CONNECTING);
-    setError(null);
-
-    try {
-      const res = await geminiByText(userText, replyRef.current);
-      updateEvaluation(res);
-
-      setReply((prev) => [...prev, { message: userText, reply: res.reply }]);
-      setStatus(CConversationStatus.IDLE);
-    } catch (e: any) {
-      setError(e.message || "AI 요청 중 오류가 발생했습니다.");
-      setStatus(CConversationStatus.ERROR);
-    }
-  }, []);
-
   const handleAudioInput = useCallback(async (audioBlob: Blob) => {
-    setStatus(CConversationStatus.CONNECTING);
+    setStatus(ConversationStatus.CONNECTING);
     setError(null);
 
     try {
-      const res = await geminiByFile(audioBlob, replyRef.current);
-      updateEvaluation(res);
+      const res = await speakByFile(audioBlob, replyRef.current);
+      const data = res.payload;
+      if (!data) throw Error();
+      updateEvaluation(data);
+      speakText(data.reply);
 
-      setReply((prev) => [...prev, { message: res.user, reply: res.reply }]);
-      setStatus(CConversationStatus.IDLE);
+      setReply((prev) => [...prev, { message: data.user, reply: data.reply }]);
+      setStatus(ConversationStatus.IDLE);
     } catch (e: any) {
       setError(e.message || "AI 음성 요청 중 오류가 발생했습니다.");
-      setStatus(CConversationStatus.ERROR);
+      setStatus(ConversationStatus.ERROR);
     }
   }, []);
 
@@ -70,7 +55,6 @@ export const useHandlerAccess = (
     reply,
     error,
     transcriptEndRef,
-    handleUserInput,
     handleAudioInput,
   };
 };

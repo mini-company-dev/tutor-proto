@@ -1,16 +1,16 @@
 import { ObjectiveTestResult } from "./objective-test/clientTestType";
 import { TutorSpeakEvaluation } from "./speak-test/tutorSpeakTypes";
 
-export interface CEvaluationMetrics
+export interface EvaluationMetrics
   extends TutorSpeakEvaluation,
     ObjectiveTestResult {}
 
-interface CEvaluationMetricDetail {
+interface EvaluationMetricDetail {
   score: number;
   count: number;
   sentence: string[];
 }
 
-export type CEvaluationMetricsExtended = {
-  [K in keyof CEvaluationMetrics]: CEvaluationMetricDetail;
+export type EvaluationMetricsExtended = {
+  [K in keyof EvaluationMetrics]: EvaluationMetricDetail;
 };

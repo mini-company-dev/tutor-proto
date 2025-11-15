@@ -1,17 +1,17 @@
-import { CApiResponse } from "@/type/clientApiResponse";
+import { ClientResponse } from "@/type/clientResponse";
 import { requestApi } from "./apiFactory";
 import {
-  CGrammarTest,
-  CGrammarTestResult,
-  CLevel,
-  CTestType,
+  GrammarTest,
+  GrammarTestResult,
+  Level,
+  TestType,
 } from "@/type/test/objective-test/clientTestType";
 
 export async function getGrammerTestAnswerByLevel(
-  level: CLevel,
-  testType: CTestType
-): Promise<CApiResponse<CGrammarTest[]>> {
-  return requestApi<CGrammarTest[]>(
+  level: Level,
+  testType: TestType
+): Promise<ClientResponse<GrammarTest[]>> {
+  return requestApi<GrammarTest[]>(
     "GET",
     `/api/test?level=${level}&type=${testType}`
   );
@@ -19,15 +19,15 @@ export async function getGrammerTestAnswerByLevel(
 
 export async function getGrammerTestAnswerById(
   id: string
-): Promise<CApiResponse<CGrammarTest>> {
-  return requestApi<CGrammarTest>("GET", `/api/test/${id}`);
+): Promise<ClientResponse<GrammarTest>> {
+  return requestApi<GrammarTest>("GET", `/api/test/${id}`);
 }
 
 export async function gradingTestAnswerById(
   id: string,
   answerId: string
-): Promise<CApiResponse<CGrammarTestResult>> {
-  return requestApi<CGrammarTestResult>(
+): Promise<ClientResponse<GrammarTestResult>> {
+  return requestApi<GrammarTestResult>(
     "GET",
     `/api/test/grading/${id}?answer=${answerId}`
   );

@@ -1,9 +1,9 @@
-import { CGrammarTest } from "@/type/test/objective-test/clientTestType";
+import { GrammarTest } from "@/type/test/objective-test/clientTestType";
 import { motion } from "framer-motion";
 
 interface Prop {
   count: number;
-  test: CGrammarTest;
+  test: GrammarTest;
   onSubmitAnswer: (id: string) => void;
 }
 

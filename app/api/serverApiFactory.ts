@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import axios, { AxiosRequestConfig, Method } from "axios";
-import { SApiResponse } from "@/type/serverApiResponse";
-import { CApiResponse } from "@/type/clientApiResponse";
+import axios, { Method } from "axios";
+import { ApiResponse } from "@/app/api/response/apiResponse";
 import { getCached, setCached } from "@/lib/cache";
 
-export function createServerApiHandler<T>(
+/**
+ * ApiResponse<ApiData> -> ClientResponse<ApiData>로 변환하는 로직이 포함 됨
+ * 이를 사용하는 로직에서 ClientResposne<ApiData> -> ClientResponse<Data>로 변환하는 로직을 작성
+ */
+export function serverApiHandler<T>(
   method: Method,
   path: string,
   cacheKey?: string
@@ -12,40 +15,64 @@ export function createServerApiHandler<T>(
   return async (
     req: NextRequest,
     context?: { params?: { id?: string } }
-  ): Promise<NextResponse<CApiResponse<T>>> => {
+  ): Promise<NextResponse<ApiResponse<T | null>>> => {
     try {
-      const token = req.headers.get("token");
-      const dto = req.method === "GET" ? undefined : await req.json();
+      const isPrefetch = req.headers.get("next-router-prefetch") === "1";
+      if (isPrefetch) {
+        console.log("Prefetch request ignored");
+        return NextResponse.json(
+          { data: null, code: 0, message: "Prefetch request ignored" },
+          { status: 204 }
+        );
+      }
 
-      const params = context ? await context.params : undefined;
+      const token = req.headers.get("token");
+
+      let dto: any;
+      if (req.method !== "GET") {
+        try {
+          dto = await req.json();
+        } catch {
+          dto = undefined;
+        }
+      }
+
+      const params = context?.params ? await context.params : undefined;
       const id = params?.id;
       const fullPath = buildFullUrl(id, req, path);
 
       if (cacheKey) {
-        const cached = getCached(buildCacheKey(cacheKey, id));
+        const key = buildCacheKey(cacheKey, id);
+        const cached = getCached(key);
         if (cached) {
-          return apiSuccessHandler<T>(cached);
+          return NextResponse.json(cached);
         }
       }
 
-      const config: AxiosRequestConfig = {
+      const serverResponse = await axios.request<ApiResponse<T>>({
         method,
         url: fullPath,
         data: dto,
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `${token}` } : {}),
+          ...(token ? { Authorization: token } : {}),
         },
         validateStatus: () => true,
-      };
+      });
 
-      const serverResponse = await axios.request<SApiResponse<T>>(config);
-      const response = serverResponse.data;
-      if (cacheKey) setCached(buildCacheKey(cacheKey, id), response);
-      return apiSuccessHandler<T>(response);
+      if (cacheKey) {
+        const key = buildCacheKey(cacheKey, id);
+        console.log("Cache");
+        setCached(key, serverResponse.data);
+      }
+
+      return NextResponse.json(serverResponse.data);
     } catch (err: any) {
       console.error("Server API Error:", err.message);
-      return apiErrorHandler(err);
+      return NextResponse.json(
+        { data: null, code: 999, message: "Server Response Error" },
+        { status: 500 }
+      );
     }
   };
 }
@@ -62,26 +89,4 @@ const buildFullUrl = (
   const queryString = req.nextUrl.search;
   const replacedPath = id ? path.replace(":id", id) : path;
   return `${process.env.API_URL}${replacedPath}${queryString || ""}`;
-};
-
-const apiSuccessHandler = <T>(
-  response: SApiResponse<T>
-): NextResponse<CApiResponse<T>> => {
-  return NextResponse.json<CApiResponse<T>>(
-    {
-      payload: response.data,
-      explanation: response.message ?? "요청 성공",
-    },
-    { status: 200 }
-  );
-};
-
-const apiErrorHandler = <T>(err: any): NextResponse<CApiResponse<T>> => {
-  return NextResponse.json(
-    {
-      payload: undefined,
-      explanation: err.response?.data?.message || err.message || "서버 오류",
-    },
-    { status: err.response?.status || 500 }
-  );
 };

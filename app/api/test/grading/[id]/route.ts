@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CApiResponse } from "@/type/clientApiResponse";
-import { createServerApiHandler } from "@/app/api/serverApiFactory";
-import { SGrammarTest } from "@/type/test/objective-test/serverTestTyoe";
-import { CGrammarTestResult } from "@/type/test/objective-test/clientTestType";
+import { serverApiHandler } from "@/app/api/serverApiFactory";
+import { GrammarTestResult } from "@/type/test/objective-test/clientTestType";
+import { ApiGrammarTest } from "@/app/api/response/apiGrammerTestResponse";
+import {
+  apiErrorHandler,
+  apiSuccessHandler,
+} from "@/app/api/apiResponseHandler";
+import { ClientResponse } from "@/type/clientResponse";
+import { ApiResponse } from "@/app/api/response/apiResponse";
 
-const baseHandler = createServerApiHandler<SGrammarTest>(
+const baseHandler = serverApiHandler<ApiGrammarTest>(
   "GET",
   "/api/tests/:id",
   "TEST_ID_KEY"
@@ -13,33 +18,27 @@ const baseHandler = createServerApiHandler<SGrammarTest>(
 export const GET = async (
   req: NextRequest,
   context: any
-): Promise<NextResponse<CApiResponse<CGrammarTestResult | null>>> => {
+): Promise<NextResponse<ClientResponse<GrammarTestResult>>> => {
   const apiResponse = await baseHandler(req, context);
-  const response: CApiResponse<SGrammarTest> = await apiResponse.json();
+  const response: ApiResponse<ApiGrammarTest> = await apiResponse.json();
+  const data = response.data;
 
   const searchParams = req.nextUrl.searchParams;
   const answerId = searchParams.get("answer");
 
-  const data = response.payload;
   if (data) {
     for (const answer of data?.answers ?? []) {
       if (answer.id === answerId) {
-        return NextResponse.json<CApiResponse<CGrammarTestResult>>({
-          payload: {
-            id: data.id,
-            problem: data.problem,
-            level: data.level,
-            answers: answer.content,
-            isGraded: !!answer.correct,
-          },
-          explanation: answer.correct ? "정답입니다" : "오답입니다",
+        return apiSuccessHandler<GrammarTestResult>({
+          id: data.id,
+          problem: data.problem,
+          level: data.level,
+          answers: answer.content,
+          isGraded: answer.correct,
         });
       }
     }
   }
 
-  return NextResponse.json<CApiResponse<CGrammarTestResult | null>>({
-    payload: null,
-    explanation: "오류입니다",
-  });
+  return apiErrorHandler();
 };

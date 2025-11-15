@@ -6,7 +6,7 @@ import { BotIcon, MicIcon, EndSessionIcon } from "@/app/styles/icons";
 import { useHandlerAccess } from "@/app/level-test/step/aiTutorApi/useHandlerAccess";
 import { useAudioRecorder } from "@/app/level-test/step/aiTutorApi/useAudioRecorder";
 import { StatusIndicator } from "@/app/level-test/step/aiTutorApi/StatusIndicator";
-import { CConversationStatus } from "@/type/test/speak-test/clientAiType";
+import { ConversationStatus } from "@/type/test/speak-test/clientAiType";
 
 interface Prop {
   nextStep: () => void;
@@ -38,7 +38,7 @@ export default function SpeakStep({
   }, [audioBlob, handleAudioInput, setAudioBlob]);
 
   useEffect(() => {
-    if (recording) setStatus(CConversationStatus.LISTENING);
+    if (recording) setStatus(ConversationStatus.LISTENING);
   }, [recording]);
 
   return (

@@ -11,10 +11,10 @@ import {
 import { motion } from "framer-motion";
 import { EndSessionIcon } from "@/app/styles/icons";
 import AiBot from "@/components/ui/aiBot";
-import { CEvaluationMetricsExtended } from "@/type/test/globalScore";
+import { EvaluationMetricsExtended } from "@/type/test/globalScore";
 
 interface Prop {
-  score: CEvaluationMetricsExtended;
+  score: EvaluationMetricsExtended;
   nextStep: () => void;
 }
 
