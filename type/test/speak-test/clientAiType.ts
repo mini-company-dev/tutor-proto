@@ -1,4 +1,4 @@
-export enum CConversationStatus {
+export enum ConversationStatus {
   IDLE,
   CONNECTING,
   LISTENING,

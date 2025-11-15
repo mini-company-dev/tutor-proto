@@ -3,18 +3,23 @@
 import AiBot from "@/components/ui/aiBot";
 import { motion } from "framer-motion";
 import { QuestionContext } from "./QuestionContext";
-import { CTestType } from "@/type/test/objective-test/clientTestType";
+import { TestType } from "@/type/test/objective-test/clientTestType";
 import useChoiceTest from "./useChoiceTest";
 import { useState } from "react";
 
 interface Prop {
-  type: CTestType;
+  type: TestType;
   label: string;
   nextStep: () => void;
   updateScore: (addScore: number, sentence: string) => void;
 }
 
-export default function QuestionSection({ type, label, nextStep, updateScore }: Prop) {
+export default function QuestionSection({
+  type,
+  label,
+  nextStep,
+  updateScore,
+}: Prop) {
   const [count, setCount] = useState(1);
 
   const nextCount = () => {
@@ -29,7 +34,7 @@ export default function QuestionSection({ type, label, nextStep, updateScore }: 
     count,
     nextCount,
     type,
-    globalScoreUpdate: updateScore
+    globalScoreUpdate: updateScore,
   });
 
   const test = getTest();

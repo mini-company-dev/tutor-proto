@@ -1,13 +1,13 @@
-import { CConversationStatus } from "@/type/test/speak-test/clientAiType";
+import { ConversationStatus } from "@/type/test/speak-test/clientAiType";
 
 interface Props {
-  status: CConversationStatus;
+  status: ConversationStatus;
   error?: string | null;
 }
 
 export const StatusIndicator = ({ status, error }: Props) => {
   switch (status) {
-    case CConversationStatus.CONNECTING:
+    case ConversationStatus.CONNECTING:
       return (
         <div className="flex items-center text-[#eab308]">
           <div className="w-2.5 h-2.5 bg-[#eab308] rounded-full mr-2 animate-ping"></div>
@@ -15,7 +15,7 @@ export const StatusIndicator = ({ status, error }: Props) => {
         </div>
       );
 
-    case CConversationStatus.LISTENING:
+    case ConversationStatus.LISTENING:
       return (
         <div className="flex items-center text-[#16a34a]">
           <div className="w-2.5 h-2.5 bg-[#16a34a] rounded-full mr-2 animate-pulse"></div>
@@ -23,7 +23,7 @@ export const StatusIndicator = ({ status, error }: Props) => {
         </div>
       );
 
-    case CConversationStatus.PROCESSING_ASSESSMENT:
+    case ConversationStatus.PROCESSING_ASSESSMENT:
       return (
         <div className="flex items-center text-[#0891b2] animate-pulse">
           <div className="w-2.5 h-2.5 bg-[#06b6d4] rounded-full mr-2 animate-bounce"></div>
@@ -31,7 +31,7 @@ export const StatusIndicator = ({ status, error }: Props) => {
         </div>
       );
 
-    case CConversationStatus.ASSESSMENT_READY:
+    case ConversationStatus.ASSESSMENT_READY:
       return (
         <div className="flex items-center text-[#a21caf]">
           <div className="w-2.5 h-2.5 bg-[#a21caf] rounded-full mr-2"></div>
@@ -39,7 +39,7 @@ export const StatusIndicator = ({ status, error }: Props) => {
         </div>
       );
 
-    case CConversationStatus.ERROR:
+    case ConversationStatus.ERROR:
       return (
         <div className="flex items-center text-[#dc2626]">
           <div className="w-2.5 h-2.5 bg-[#dc2626] rounded-full mr-2"></div>
@@ -47,7 +47,7 @@ export const StatusIndicator = ({ status, error }: Props) => {
         </div>
       );
 
-    case CConversationStatus.IDLE:
+    case ConversationStatus.IDLE:
     default:
       return (
         <div className="flex items-center text-gray-600">

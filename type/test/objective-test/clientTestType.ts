@@ -1,7 +1,7 @@
-export type CLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+export type Level = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
-export function getCLevelByNumber(num: number): CLevel {
-  const map: Record<number, CLevel> = {
+export function getCLevelByNumber(num: number): Level {
+  const map: Record<number, Level> = {
     1: "A1",
     2: "A2",
     3: "B1",
@@ -17,19 +17,19 @@ export function getCLevelByNumber(num: number): CLevel {
   return level;
 }
 
-export type CTestType = "Grammar" | "Vocabulary";
+export type TestType = "Grammar" | "Vocabulary";
 
-export interface CGrammarTestAnswer {
+export interface GrammarTestAnswer {
   id: string;
   content: string;
 }
 
-export interface CGrammarTest {
+export interface GrammarTest {
   id: string;
   problem: string;
-  level: CLevel;
-  type: CTestType;
-  answers: CGrammarTestAnswer[];
+  level: Level;
+  type: TestType;
+  answers: GrammarTestAnswer[];
 }
 
 export interface ObjectiveTestResult {
@@ -37,10 +37,10 @@ export interface ObjectiveTestResult {
   vocabulary: number;
 }
 
-export interface CGrammarTestResult {
+export interface GrammarTestResult {
   id: string;
   problem: string;
-  level: CLevel;
+  level: Level;
   answers: string;
   isGraded: boolean;
 }

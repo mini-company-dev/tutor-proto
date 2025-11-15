@@ -5,8 +5,8 @@ import {
   gradingTestAnswerById,
 } from "@/lib/grammerTestAnswer";
 import {
-  CGrammarTest,
-  CTestType,
+  GrammarTest,
+  TestType,
   getCLevelByNumber,
 } from "@/type/test/objective-test/clientTestType";
 import { useEffect, useMemo, useState } from "react";
@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 interface Prop {
   count: number;
   nextCount: () => void;
-  type: CTestType;
+  type: TestType;
   globalScoreUpdate: (addScore: number, sentence: string) => void;
 }
 
@@ -36,7 +36,7 @@ export default function useChoiceTest({
   const [level, setLevel] = useState(3);
   const [levelCorrectCount, setLevelCorrectCount] = useState(0);
   const [levelCount, setLevelCount] = useState(0);
-  const [tests, setTests] = useState<CGrammarTest[]>([]);
+  const [tests, setTests] = useState<GrammarTest[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -82,10 +82,10 @@ export default function useChoiceTest({
     const res = await gradingTestAnswerById(currentTest.id, answerId);
     setLevelCount(levelCount + 1);
 
-    if(res.payload) {
+    if (res.payload) {
       const sentence = res.payload.problem;
       const answer = res.payload.answers;
-      const fullSentence = sentence.replace("___", answer)
+      const fullSentence = sentence.replace("___", answer);
 
       if (res.payload?.isGraded) {
         const score = getScoreByLevel(level);
@@ -130,7 +130,5 @@ const calculateNextLevel = (
   prevLevel: number,
   levelCorrectCount: number
 ): number => {
-  return levelCorrectCount >= 2
-    ? prevLevel + 1
-    : Math.max(1, prevLevel - 1);
+  return levelCorrectCount >= 2 ? prevLevel + 1 : Math.max(1, prevLevel - 1);
 };

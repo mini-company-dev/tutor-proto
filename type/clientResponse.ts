@@ -1,4 +1,4 @@
-export interface CApiResponse<T> {
+export interface ClientResponse<T> {
   payload?: T;
   explanation?: string;
 }
