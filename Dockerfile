@@ -3,6 +3,9 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 RUN npm install -g pnpm
 
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --frozen-lockfile
 COPY . .
