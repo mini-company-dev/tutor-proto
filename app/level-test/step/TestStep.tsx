@@ -9,10 +9,15 @@ interface Prop {
   nextStep: () => void;
   type: TestType;
   label: string;
-  updateScore: (addScore: number, sentence: string) => void;
+  globalUpdateScore: (score: number, sentences: string[]) => void;
 }
 
-export default function TestStep({ nextStep, type, label, updateScore }: Prop) {
+export default function TestStep({
+  nextStep,
+  type,
+  label,
+  globalUpdateScore,
+}: Prop) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -24,7 +29,7 @@ export default function TestStep({ nextStep, type, label, updateScore }: Prop) {
         type={type}
         label={label}
         nextStep={nextStep}
-        updateScore={updateScore}
+        globalUpdateScore={globalUpdateScore}
       />
       <div className="mt-10 flex justify-center text-[var(--brand)]/70">
         <SparklesIcon className="w-5 h-5 animate-pulse" />

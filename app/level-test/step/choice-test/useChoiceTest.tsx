@@ -9,22 +9,22 @@ import {
   TestType,
   getCLevelByNumber,
 } from "@/type/test/objective-test/clientTestType";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useAnimation } from "framer-motion";
 
 interface Prop {
   count: number;
   nextCount: () => void;
   type: TestType;
-  globalScoreUpdate: (addScore: number, sentence: string) => void;
+  globalScoreUpdate: (score: number, sentences: string[]) => void;
 }
 
-const levelMap: Record<string, number> = {
+const scoreMap: Record<string, number> = {
   A1: 1,
   A2: 2,
   B1: 3,
   B2: 4,
   C1: 5,
-  C2: 6,
 };
 
 export default function useChoiceTest({
@@ -33,13 +33,15 @@ export default function useChoiceTest({
   type,
   globalScoreUpdate,
 }: Prop) {
-  const [level, setLevel] = useState(3);
-  const [levelCorrectCount, setLevelCorrectCount] = useState(0);
-  const [levelCount, setLevelCount] = useState(0);
+  const [level, setLevel] = useState(4);
   const [tests, setTests] = useState<GrammarTest[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const userScore = useRef(0);
+  const maxScore = useRef(0);
+  const levelCountRef = useRef(1);
+  const sentences = useRef<string[]>([]);
 
   const currentTest = useMemo(() => tests[count - 1], [tests, count]);
 
@@ -60,8 +62,6 @@ export default function useChoiceTest({
             const before = prev.slice(0, count + 1);
             return [...before, ...(res.payload ?? [])];
           });
-          setLevelCount(0);
-          setLevelCorrectCount(0);
         } else {
           setTests([]);
           console.warn("불러올 문제가 없습니다.", { level, type });
@@ -80,24 +80,26 @@ export default function useChoiceTest({
 
   const onSubmitAnswer = async (answerId: string) => {
     const res = await gradingTestAnswerById(currentTest.id, answerId);
-    setLevelCount(levelCount + 1);
+    if (!res.payload) throw Error("서버 호출 오류");
 
-    if (res.payload) {
-      const sentence = res.payload.problem;
-      const answer = res.payload.answers;
-      const fullSentence = sentence.replace("___", answer);
+    levelCountRef.current += 1;
 
-      if (res.payload?.isGraded) {
-        const score = getScoreByLevel(level);
-        globalScoreUpdate(score, fullSentence);
-        setLevelCorrectCount(levelCorrectCount + 1);
-      } else {
-        globalScoreUpdate(0, fullSentence);
-      }
+    maxScore.current += getScoreByLevel(level);
+    if (res.payload.isGraded) {
+      userScore.current += getScoreByLevel(level);
     }
 
-    if (getIsUpgrade(levelCount)) {
-      setLevel((prev) => calculateNextLevel(prev, levelCorrectCount));
+    const sentence = res.payload.problem;
+    const answer = res.payload.answers;
+    const fullSentence = sentence.replace("___", answer);
+
+    sentences.current.push(fullSentence);
+
+    if (levelCountRef.current % 4 === 0) {
+      setLevel(() =>
+        calculateLevelFromRatio((userScore.current / maxScore.current) * 100)
+      );
+      levelCountRef.current = 1;
     }
 
     nextCount();
@@ -105,30 +107,26 @@ export default function useChoiceTest({
 
   const getScoreByLevel = (level: number): number => {
     const lv = getCLevelByNumber(level);
-    const map: Record<string, number> = {
-      A1: 1,
-      A2: 2,
-      B1: 3,
-      B2: 4,
-      C1: 5,
-      C2: 6,
-    };
-    return map[lv] ?? 0;
+    return scoreMap[lv] ?? 0;
   };
+
+  const updateScore = () => {
+    globalScoreUpdate(((userScore.current / maxScore.current) * 100), sentences.current);
+  }
 
   return {
     onSubmitAnswer,
+    updateScore,
     getTest: () => currentTest,
     loading,
     error,
   };
 }
 
-const getIsUpgrade = (step: number): boolean => step % 3 === 0;
-
-const calculateNextLevel = (
-  prevLevel: number,
-  levelCorrectCount: number
-): number => {
-  return levelCorrectCount >= 2 ? prevLevel + 1 : Math.max(1, prevLevel - 1);
+const calculateLevelFromRatio = (ratio: number): number => {
+  if (ratio < 20) return 1;
+  if (ratio < 40) return 2;
+  if (ratio < 60) return 3;
+  if (ratio < 80) return 4;
+  return 5;
 };

@@ -2,9 +2,8 @@ import {
   ReplyEntry,
   TutorResponse,
 } from "@/type/test/speak-test/tutorSpeakTypes";
-import speakText from "@/app/service/geminiSpeak";
 import { ClientResponse } from "@/type/clientResponse";
-import { requestApi } from "./apiFactory";
+import { callSererApi } from "./apiFactory";
 
 export async function speakByFile(
   audioBlob: Blob,
@@ -19,9 +18,9 @@ export async function speakByFile(
   formData.append("file", audioBlob, "voice.webm");
   formData.append("history", JSON.stringify(history));
 
-  const response = await requestApi<TutorResponse>(
+  const response = await callSererApi<TutorResponse>(
     "POST",
-    "/api/aiTutorFile",
+    "/api/aiTest",
     formData
   );
 

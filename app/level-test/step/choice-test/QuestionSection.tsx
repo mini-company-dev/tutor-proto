@@ -11,31 +11,33 @@ interface Prop {
   type: TestType;
   label: string;
   nextStep: () => void;
-  updateScore: (addScore: number, sentence: string) => void;
+  globalUpdateScore: (score: number, sentences: string[]) => void;
 }
 
 export default function QuestionSection({
   type,
   label,
   nextStep,
-  updateScore,
+  globalUpdateScore,
 }: Prop) {
   const [count, setCount] = useState(1);
 
   const nextCount = () => {
     if (count === 15) {
+      updateScore();
       nextStep();
       return;
     }
     setCount(count + 1);
   };
 
-  const { onSubmitAnswer, getTest, loading, error } = useChoiceTest({
-    count,
-    nextCount,
-    type,
-    globalScoreUpdate: updateScore,
-  });
+  const { onSubmitAnswer, updateScore, getTest, loading, error } =
+    useChoiceTest({
+      count,
+      type,
+      nextCount,
+      globalScoreUpdate: globalUpdateScore,
+    });
 
   const test = getTest();
 
