@@ -2,6 +2,7 @@ import { apiSuccessHandler } from "@/app/api/apiResponseHandler";
 import { ApiResponse } from "@/app/api/response/apiResponse";
 import { ClientResponse } from "@/type/clientResponse";
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios";
+import { env } from "next-runtime-env";
 
 export async function callNextApi<T>(
   method: Method,
@@ -54,7 +55,7 @@ export async function callSererApi<T>(
   config?: AxiosRequestConfig
 ): Promise<ClientResponse<T>> {
   try {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL;
+    const baseURL = env('NEXT_PUBLIC_API_URL');
     if (!baseURL) {
       throw new Error("NEXT_PUBLIC_API_URL is missing");
     }
