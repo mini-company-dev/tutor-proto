@@ -62,7 +62,6 @@ export function serverApiHandler<T>(
 
       if (cacheKey) {
         const key = buildCacheKey(cacheKey, id);
-        console.log("Cache");
         setCached(key, serverResponse.data);
       }
 
