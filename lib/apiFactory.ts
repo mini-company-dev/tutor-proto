@@ -59,6 +59,8 @@ export async function callSererApi<T>(
       throw new Error("NEXT_PUBLIC_API_URL is missing");
     }
 
+    console.log(baseURL); // 삭제 해야 됨
+
     const isFormData = data instanceof FormData;
 
     const headers: Record<string, any> = {
