@@ -10,9 +10,9 @@ import { ConversationStatus } from "@/type/test/speak-test/clientAiType";
 
 interface Prop {
   nextStep: () => void;
-  updateScorePronunciation: (addScore: number, sentence: string) => void;
-  updateScoreFluency: (addScore: number, sentence: string) => void;
-  updateScoreCoherence: (addScore: number, sentence: string) => void;
+  updateScorePronunciation: (score: number, sentences: string[]) => void;
+  updateScoreFluency: (score: number, sentences: string[]) => void;
+  updateScoreCoherence: (score: number, sentences: string[]) => void;
 }
 
 export default function SpeakStep({
@@ -21,7 +21,7 @@ export default function SpeakStep({
   updateScoreFluency,
   updateScoreCoherence,
 }: Prop) {
-  const { status, setStatus, reply, error, handleAudioInput } =
+  const { status, setStatus, reply, error, handleAudioInput, updateScore } =
     useHandlerAccess(
       updateScorePronunciation,
       updateScoreFluency,
@@ -129,7 +129,10 @@ export default function SpeakStep({
         </motion.button>
 
         <motion.button
-          onClick={nextStep}
+          onClick={() => {
+            nextStep();
+            updateScore();
+          }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           transition={{ duration: 0.2 }}

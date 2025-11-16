@@ -29,7 +29,7 @@ export default function LevelTest() {
           nextStep={nextStep}
           type={"Grammar"}
           label="1차 문법 테스트"
-          updateScore={updateScoreGrammar}
+          globalUpdateScore={updateScoreGrammar}
         />
       );
     case 2:
@@ -40,7 +40,7 @@ export default function LevelTest() {
           nextStep={nextStep}
           type={"Vocabulary"}
           label="2차 문법 테스트"
-          updateScore={updateScoreVocabulary}
+          globalUpdateScore={updateScoreVocabulary}
         />
       );
     case 4:

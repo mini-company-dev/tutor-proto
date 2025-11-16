@@ -20,26 +20,18 @@ interface Prop {
 
 const getLevelByScore = (avg: number): string => {
   const rounded = Math.round(avg);
-  switch (rounded) {
-    case 1:
-      return "A1";
-    case 2:
-      return "A2";
-    case 3:
-      return "B1";
-    case 4:
-      return "B2";
-    case 5:
-      return "C1";
-    default:
-      return "A1";
-  }
+
+  if (rounded <= 20) return "A1";
+  if (rounded <= 40) return "A2";
+  if (rounded <= 60) return "B1";
+  if (rounded <= 80) return "B2";
+  return "C1";
 };
 
 export default function Step5({ score, nextStep }: Prop) {
   const data = Object.entries(score).map(([metric, { score }]) => ({
     metric,
-    value: Number(score.toFixed(2)),
+    value: Number(score.toFixed(2)), // 이미 평균 0~100
   }));
 
   const avg =
@@ -100,7 +92,7 @@ export default function Step5({ score, nextStep }: Prop) {
 
       {/* 🔹 평균 점수 + 레벨 */}
       <div className="bg-[var(--brand)]/10 border border-[var(--brand)]/30 text-[var(--brand)] px-4 py-2 rounded-full text-sm font-semibold inline-block backdrop-blur-sm shadow-sm">
-        종합 평균: {avg.toFixed(2)} / 5 →{" "}
+        종합 평균: {avg.toFixed(2)} / 100 →{" "}
         <span className="font-bold">{level}</span> 레벨
       </div>
 

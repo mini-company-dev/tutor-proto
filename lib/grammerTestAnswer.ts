@@ -1,5 +1,5 @@
 import { ClientResponse } from "@/type/clientResponse";
-import { requestApi } from "./apiFactory";
+import { callNextApi } from "./apiFactory";
 import {
   GrammarTest,
   GrammarTestResult,
@@ -11,7 +11,7 @@ export async function getGrammerTestAnswerByLevel(
   level: Level,
   testType: TestType
 ): Promise<ClientResponse<GrammarTest[]>> {
-  return requestApi<GrammarTest[]>(
+  return callNextApi<GrammarTest[]>(
     "GET",
     `/api/test?level=${level}&type=${testType}`
   );
@@ -20,14 +20,14 @@ export async function getGrammerTestAnswerByLevel(
 export async function getGrammerTestAnswerById(
   id: string
 ): Promise<ClientResponse<GrammarTest>> {
-  return requestApi<GrammarTest>("GET", `/api/test/${id}`);
+  return callNextApi<GrammarTest>("GET", `/api/test/${id}`);
 }
 
 export async function gradingTestAnswerById(
   id: string,
   answerId: string
 ): Promise<ClientResponse<GrammarTestResult>> {
-  return requestApi<GrammarTestResult>(
+  return callNextApi<GrammarTestResult>(
     "GET",
     `/api/test/grading/${id}?answer=${answerId}`
   );

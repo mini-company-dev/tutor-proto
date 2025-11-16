@@ -7,8 +7,7 @@ export interface EvaluationMetrics
 
 interface EvaluationMetricDetail {
   score: number;
-  count: number;
-  sentence: string[];
+  sentences: string[];
 }
 
 export type EvaluationMetricsExtended = {
