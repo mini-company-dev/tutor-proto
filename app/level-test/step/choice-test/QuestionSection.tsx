@@ -23,7 +23,7 @@ export default function QuestionSection({
   const [count, setCount] = useState(1);
 
   const nextCount = () => {
-    if (count === 15) {
+    if (count === maxCount) {
       updateScore();
       nextStep();
       return;
@@ -41,6 +41,8 @@ export default function QuestionSection({
 
   const test = getTest();
 
+  const maxCount = 9;
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -51,14 +53,14 @@ export default function QuestionSection({
           </h2>
         </div>
         <p className="text-sm text-[var(--text-light)] font-medium">
-          문항 {count} / 15
+          문항 {count} / {maxCount}
         </p>
       </div>
 
       <div className="w-full bg-[var(--sub)] h-2 rounded-full overflow-hidden mb-8 border border-[var(--brand)]/10">
         <motion.div
           className="h-full bg-gradient-to-r from-[var(--brand)] to-sky-400"
-          animate={{ width: `${(count / 15) * 100}%` }}
+          animate={{ width: `${(count / maxCount) * 100}%` }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         />
       </div>

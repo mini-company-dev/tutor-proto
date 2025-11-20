@@ -65,7 +65,7 @@ export default function Step5({ score, nextStep }: Prop) {
             />
             <PolarRadiusAxis
               angle={30}
-              domain={[0, 5]}
+              domain={[0, 100]}
               tickCount={6}
               stroke="rgba(74,144,226,0.3)"
             />
