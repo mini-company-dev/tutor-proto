@@ -26,7 +26,9 @@ export function serverApiHandler<T>(
         );
       }
 
-      const token = req.headers.get("token");
+      const token = req.headers.get("authorization");
+
+      console.log("TOKEN: ", token);
 
       let dto: any;
       if (req.method !== "GET") {

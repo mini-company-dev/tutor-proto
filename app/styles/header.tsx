@@ -1,23 +1,24 @@
 "use client";
 
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useScroll } from "framer-motion"; // ← 이거도 빼고 싶다면 말해줘
 
 export default function Header() {
+  const router = useRouter();
+
   const [isVisible, setIsVisible] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [lastY, setLastY] = useState(0);
 
+  // 🔹 useScroll 안 쓰고 window.scrollY로 교체하고 싶으면 말해줘
   const { scrollY } = useScroll();
 
-  useMotionValueEvent(scrollY, "change", (y) => {
-    if (y > lastY && y > 100) {
-      setIsVisible(false); // 아래로 스크롤 → 숨김
-    } else {
-      setIsVisible(true); // 위로 스크롤 → 나타남
-    }
+  scrollY.on("change", (y) => {
+    if (y > lastY && y > 100) setIsVisible(false);
+    else setIsVisible(true);
     setLastY(y);
   });
 
@@ -28,11 +29,7 @@ export default function Header() {
 
   return (
     <>
-      {/* 🔹 헤더 */}
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+      <header
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 ${
           isVisible
             ? "translate-y-0 opacity-100"
@@ -47,18 +44,14 @@ export default function Header() {
             transition-all duration-500 border border-transparent
           "
         >
-          {/* ✅ 로고 */}
+          {/* 로고 */}
           <Link href="/" className="flex items-center gap-2">
-            <motion.span
-              className="text-2xl font-bold bg-gradient-to-r from-[var(--brand)] to-sky-400 bg-clip-text text-transparent"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-            >
+            <span className="text-2xl font-bold bg-gradient-to-r from-[var(--brand)] to-sky-400 bg-clip-text text-transparent">
               EasyFun
-            </motion.span>
+            </span>
           </Link>
 
-          {/* ✅ 데스크탑 메뉴 */}
+          {/* 데스크탑 메뉴 */}
           <nav className="hidden md:flex items-center gap-10">
             {navItems.map((item) => (
               <Link
@@ -71,31 +64,26 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* ✅ CTA 버튼 */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          {/* CTA: 로그인 */}
+          <button
+            onClick={() => router.push("/auth")}
             className="hidden md:inline-flex px-6 py-2 rounded-xl bg-gradient-to-r from-[var(--brand)] to-sky-400 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
           >
             로그인
-          </motion.button>
+          </button>
 
-          {/* ✅ 모바일 메뉴 버튼 */}
+          {/* 모바일 메뉴 버튼 */}
           <button
             className="md:hidden p-2 text-[var(--text-light)]"
-            onClick={() => setIsOpen((v) => !v)}
+            onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X size={26} /> : <Menu size={26} />}
           </button>
         </div>
 
-        {/* ✅ 모바일 드롭다운 메뉴 */}
+        {/* 모바일 메뉴 */}
         {isOpen && (
-          <motion.nav
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="md:hidden bg-[rgba(20,20,30,0.9)] backdrop-blur-xl border-t border-[var(--brand)]/20 px-6 pb-6"
-          >
+          <nav className="md:hidden bg-[rgba(20,20,30,0.9)] backdrop-blur-xl border-t border-[var(--brand)]/20 px-6 pb-6">
             <ul className="flex flex-col gap-5 mt-4 text-center">
               {navItems.map((item) => (
                 <li key={item.href}>
@@ -109,19 +97,22 @@ export default function Header() {
                 </li>
               ))}
               <li>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push("/auth");
+                  }}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-[var(--brand)] to-sky-400 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   로그인
-                </motion.button>
+                </button>
               </li>
             </ul>
-          </motion.nav>
+          </nav>
         )}
-      </motion.header>
+      </header>
 
-      {/* 🔹 본문과 겹치지 않도록 상단 여백 확보 */}
+      {/* 본문 offset */}
       <div className="h-[100px]" />
     </>
   );
